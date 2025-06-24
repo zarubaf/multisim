@@ -11,13 +11,12 @@ module cpu #(
     // noc -> cpu
     output bit data_noc_to_cpu_rdy,
     input bit data_noc_to_cpu_vld,
-    input bit [63:0] data_noc_to_cpu,
-    output bit transactions_done
+    input bit [63:0] data_noc_to_cpu
 );
 
   bit transaction_cpu_to_noc_done;
   bit transaction_noc_to_cpu_done;
-  assign transactions_done = transaction_cpu_to_noc_done && transaction_noc_to_cpu_done;
+  bit transactions_done = transaction_cpu_to_noc_done && transaction_noc_to_cpu_done;
 
   function automatic bit [63:0] xorshift64star(input bit [63:0] x, input bit [31:0] iterations = 1);
     repeat (iterations) begin

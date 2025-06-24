@@ -8,8 +8,7 @@ module cpu_multisim_server (
     // noc -> cpu
     output bit data_noc_to_cpu_rdy,
     input bit data_noc_to_cpu_vld,
-    input bit [63:0] data_noc_to_cpu,
-    output bit transactions_done  // TODO: always 0
+    input bit [63:0] data_noc_to_cpu
 );
 
   string server_name_cpu_to_noc;
@@ -18,9 +17,6 @@ module cpu_multisim_server (
     $sformat(server_name_cpu_to_noc, "cpu_to_noc_%0d", cpu_index);
     $sformat(server_name_noc_to_cpu, "noc_to_cpu_%0d", cpu_index);
   end
-
-  // TODO: always 0
-  assign transactions_done = 0;
 
   multisim_server_pull #(
       .DATA_WIDTH(64)

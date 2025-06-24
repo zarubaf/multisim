@@ -42,8 +42,7 @@ module top #(
         // noc -> cpu
         .data_noc_to_cpu_rdy(data_noc_to_cpu_rdy[cpu_idx]),
         .data_noc_to_cpu_vld(data_noc_to_cpu_vld[cpu_idx]),
-        .data_noc_to_cpu    (data_noc_to_cpu[cpu_idx]),
-        .transactions_done  (  /* not used */)
+        .data_noc_to_cpu    (data_noc_to_cpu[cpu_idx])
     );
   end
 

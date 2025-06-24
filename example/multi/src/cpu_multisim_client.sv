@@ -11,7 +11,6 @@ module cpu_multisim_client;
   bit data_noc_to_cpu_rdy;
   bit data_noc_to_cpu_vld;
   bit [63:0] data_noc_to_cpu;
-  bit transactions_done;
 
   bit [31:0] cpu_index;
   string server_name_cpu_to_noc;
@@ -35,8 +34,7 @@ module cpu_multisim_client;
       // noc -> cpu
       .data_noc_to_cpu_rdy(data_noc_to_cpu_rdy),
       .data_noc_to_cpu_vld(data_noc_to_cpu_vld),
-      .data_noc_to_cpu    (data_noc_to_cpu),
-      .transactions_done  (transactions_done)
+      .data_noc_to_cpu    (data_noc_to_cpu)
   );
 
   multisim_client_push #(
