@@ -1,12 +1,16 @@
-🏁 simulate your RTL with real multi-threaded speed 🏁
+🏁 speed: simulate your RTL with real multi-threaded speed  
+🧱 interoperability: interface different simulators and chips together
 
 # 💡 rationale
-RTL simulations are typically single threaded and don't scale very well when your DUT size increases.
+RTL simulations:
+* are typically single threaded and don't scale well when your DUT size increases
+* run in 1 simulation environment, which makes it hard to simulate multiple chips together
 
-`multisim` is a systemverilog/DPI library allowing multiple simulations to run in parallel and communicate to simulate your DUT.  
+`multisim` is a systemverilog/DPI library allowing multiple simulations to run in parallel and communicate to simulate your DUT.
+
 Typically, you can have:
-* 1 **server simulation** with your DUT skeleton (NOC, etc)
-* N **client simulations** with 1 big instance each (computing core, etc)
+* 1 **server simulation** with your DUT skeleton (NOC, fabric, etc)
+* N **client simulations** with 1 big instance each (computing core, chip, etc)
 
 ## example: normal vs multisim simulation
 Assuming your original simulation has N CPUs that take a lot of simulation time.
@@ -108,11 +112,11 @@ See the [example](./example/multi/run_cpu):
 
 # ⚖ pros and cons
 Pros:
-* scalability: as long as you have enough CPUs on your server
 * speed: split your big DUT in as many smaller parts as you want
+* interoperability: each server/client can use different simulators (Verilator, VCS, Questa, Xcelium, etc)
+* scalability: as long as you have enough CPUs on your server
 * cost: server CPUs are cheaper than emulation solution usually
 * bringup time: super easy modules, simple interface (e.g.: AXI is 5 channels)
-* interoperability: each server/client can use different simulators (Verilator, VCS, Questa, Xcelium, etc)
 
 Cons:
 * ⚠ **no cycle accuracy** ⚠: functionally accurate, but not cycle accurate
