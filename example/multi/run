@@ -1,10 +1,7 @@
 #!/bin/bash
 
 cpu_nb="$1"
-extra_dummy_channels="$2"
-
 [ "$cpu_nb" = "" ] && cpu_nb=4
-[ "$extra_dummy_channels" = "" ] && extra_dummy_channels=0
 
 # change ulimit to avoid libc crash
 ulimit_factor=$(((cpu_nb + 15) / 16))
@@ -17,7 +14,7 @@ rm -f output_top/server_exit
 
 # 2- start clients
 # -- compilation
-./run_cpu compilation 0 $extra_dummy_channels  > /dev/null
+./run_cpu compilation 0 > /dev/null
 for ((i=1;i<cpu_nb;i++)); do
   rm -rf output_cpu_$i
   cp -rf output_cpu_0 output_cpu_$i
@@ -28,4 +25,4 @@ for ((i=0;i<cpu_nb;i++)); do
 done
 
 # 3- start server
-./run_top $cpu_nb $extra_dummy_channels
+./run_top $cpu_nb
