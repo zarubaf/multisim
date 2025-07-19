@@ -36,6 +36,7 @@ int multisim_client_start(char const *server_name, char const *server_address,
   return 1;
 }
 
+// #define SIMULATE_SEND_FAIL_CLIENT
 int multisim_client_send_data(char const *server_name, const svBitVecVal *data, int data_width) {
   int r;
   int buf_32b_size = (data_width + 31) / 32;
@@ -45,6 +46,15 @@ int multisim_client_send_data(char const *server_name, const svBitVecVal *data, 
   for (int i = 0; i < buf_32b_size; i++) {
     send_buf[i] = data[i];
   }
+
+#ifdef SIMULATE_SEND_FAIL_CLIENT
+  static int cnt = 0;
+  cnt++;
+  if (cnt % 1000 == 0) {
+    printf("multisim_client_send_data: simulate send fail\n");
+    return 0;
+  }
+#endif
 
   r = send(new_socket[idx], send_buf, sizeof(send_buf), 0);
   if (r <= 0) { // send failed

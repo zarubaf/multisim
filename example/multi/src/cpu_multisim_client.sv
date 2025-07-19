@@ -40,7 +40,7 @@ module cpu_multisim_client;
   multisim_client_push #(
       .SERVER_RUNTIME_DIRECTORY("../output_top"),
       .DATA_WIDTH(64)
-  ) i_multisim_server_push (
+  ) i_multisim_client_push (
       .clk        (clk),
       .server_name(server_name_cpu_to_noc),
       .data_rdy   (data_cpu_to_noc_rdy),
@@ -51,12 +51,17 @@ module cpu_multisim_client;
   multisim_client_pull #(
       .SERVER_RUNTIME_DIRECTORY("../output_top"),
       .DATA_WIDTH(64)
-  ) i_multisim_server_pull (
+  ) i_multisim_client_pull (
       .clk        (clk),
       .server_name(server_name_noc_to_cpu),
       .data_rdy   (data_noc_to_cpu_rdy),
       .data_vld   (data_noc_to_cpu_vld),
       .data       (data_noc_to_cpu)
   );
+
+  //initial begin
+  //  $dumpfile("dump.vcd");
+  //  $dumpvars();
+  //end
 
 endmodule
