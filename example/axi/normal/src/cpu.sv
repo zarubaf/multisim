@@ -64,6 +64,7 @@ module cpu
     o_axi_m_ar.region <= 0;
 
     o_axi_m_arvalid <= 1;
+    @(posedge clk);
     while (!i_axi_m_arready) @(posedge clk);
     o_axi_m_arvalid <= 0;
 
@@ -88,6 +89,7 @@ module cpu
     o_axi_m_aw.region <= 0;
 
     o_axi_m_awvalid <= 1;
+    @(posedge clk);
     while (!i_axi_m_awready) @(posedge clk);
     o_axi_m_awvalid <= 0;
 
@@ -100,12 +102,15 @@ module cpu
     o_axi_m_w.last <= 1;
 
     o_axi_m_wvalid <= 1;
+    @(posedge clk);
     while (!i_axi_m_wready) @(posedge clk);
     o_axi_m_wvalid <= 0;
 
     // B
+    o_axi_m_bready <= 1;
+    @(posedge clk);
     while (!i_axi_m_bvalid) @(posedge clk);
-    // ignore response for now
+    o_axi_m_bready <= 0;
   endtask
 
   int read_transaction_nb = 0;
@@ -116,6 +121,15 @@ module cpu
     x = 64'hdeadbeefdeadbeef + longint'(cpu_index);
   end
 
+  always_ff @(posedge clk) begin
+    if (read_transaction_nb < TRANSACTION_NB) begin
+      o_axi_m_bready <= bit'($urandom);
+      o_axi_m_rready <= bit'($urandom);
+    end else begin
+      o_axi_m_bready <= 0;
+      o_axi_m_rready <= 0;
+    end
+  end
 
   always_ff @(posedge clk) begin
     o_axi_m_awvalid <= 0;
@@ -124,12 +138,9 @@ module cpu
 
     if (read_transaction_nb < TRANSACTION_NB) begin
       bit rwb = x[4];
-      bit[3:0] cmd_wait_cycles = x[3:0];
-      bit[3:0] aw_w_wait_cycles = x[8:5];
+      bit [3:0] cmd_wait_cycles = x[3:0];
+      bit [3:0] aw_w_wait_cycles = x[8:5];
       int address = int'({cpu_index, x[9+:7], 3'b0});
-
-      o_axi_m_bready <= bit'($urandom);
-      o_axi_m_rready <= bit'($urandom);
 
       x <= xorshift64star(x, COMPUTATION_COMPLEXITY * 1000000);
       wait_n_cycles(int'(cmd_wait_cycles));  // 0 to 7 cycles extra delay
@@ -144,13 +155,7 @@ module cpu
         axi_write(address, x, int'(aw_w_wait_cycles));
         $display("[cpu_%0d] 0x%016x -> [0x%016x]", cpu_index, x, address);
       end
-
-    end else begin
-      o_axi_m_bready <= 0;
-      o_axi_m_rready <= 0;
     end
-
-
   end
 
 endmodule

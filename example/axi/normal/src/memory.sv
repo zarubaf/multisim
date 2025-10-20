@@ -80,11 +80,12 @@ module memory
         end
 
         // R
-        if (i_axi_s_rready[cpu_idx]) begin
+        if (i_axi_s_rready[cpu_idx] && (ar_queue.size() >= 1)) begin
           // respond to write transactions
           o_axi_s_r[cpu_idx].id   <= ar_queue[0].id;
           o_axi_s_r[cpu_idx].resp <= 0;
           o_axi_s_r[cpu_idx].data <= memory_array[ar_queue[0].addr>>3];
+          o_axi_s_rvalid[cpu_idx] <= 1;
           // remove processed transactions from queues
           ar_queue.pop_front();
           // update read transaction count
