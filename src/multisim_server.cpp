@@ -12,11 +12,11 @@ using namespace std;
 
 extern "C" int multisim_server_start(char const *server_name);
 extern "C" int multisim_server_get_data(char const *server_name,
-                                        svBitVecVal *data,
+                                        svOpenArrayHandle data_handle,
                                         int data_width);
 extern "C" int multisim_server_send_data(char const *server_name,
-                                        const svBitVecVal *data,
-                                        int data_width);
+                                         const svOpenArrayHandle data_handle,
+                                         int data_width);
 
 #define MULTISIM_SERVER_MAX 256
 Server *server[MULTISIM_SERVER_MAX];
@@ -36,11 +36,13 @@ int multisim_server_start(char const *server_name) {
   return 0;
 }
 
-int multisim_server_get_data(char const *server_name, svBitVecVal *data, int data_width) {
+int multisim_server_get_data(char const *server_name,
+                             svOpenArrayHandle data_handle, int data_width) {
   int r;
   int buf_32b_size = (data_width + 31) / 32;
   uint32_t read_buf[buf_32b_size];
   int idx = server_name_to_idx[server_name];
+  svBitVecVal *data = (svBitVecVal *)svGetArrayPtr(data_handle);
 
   if (new_socket[idx] < 0) {
     new_socket[idx] = server[idx]->acceptNewSocket();
@@ -66,11 +68,14 @@ int multisim_server_get_data(char const *server_name, svBitVecVal *data, int dat
 }
 
 // #define SIMULATE_SEND_FAIL_SERVER
-int multisim_server_send_data(char const *server_name, const svBitVecVal *data, int data_width) {
+int multisim_server_send_data(char const *server_name,
+                              const svOpenArrayHandle data_handle,
+                              int data_width) {
   int r;
   int buf_32b_size = (data_width + 31) / 32;
   uint32_t send_buf[buf_32b_size];
   int idx = server_name_to_idx[server_name];
+  svBitVecVal *data = (svBitVecVal *)svGetArrayPtr(data_handle);
 
   if (new_socket[idx] < 0) {
     new_socket[idx] = server[idx]->acceptNewSocket();

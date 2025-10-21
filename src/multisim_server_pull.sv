@@ -21,7 +21,7 @@ module multisim_server_pull #(
     bit [DATA_WIDTH-1:0] data_dpi;
     if (server_has_started && (!data_vld || data_rdy)) begin
       int data_vld_dpi;
-      data_vld_dpi = multisim_server_get_data(server_name, data_dpi, DATA_WIDTH);
+      data_vld_dpi = multisim_server_get_data_packed(server_name, data_dpi, DATA_WIDTH);
       data_vld <= data_vld_dpi[0];
       data <= data_dpi;
     end
