@@ -51,7 +51,11 @@ module top
   );
 
   for (genvar cpu_idx = 0; cpu_idx < CPU_NB; cpu_idx++) begin : gen_cpu
+`ifndef MULTISIM
     cpu i_cpu (
+`else
+    cpu_multisim_server i_cpu_multisim_server (
+`endif
         .clk      (clk),
         .cpu_index(cpu_idx),
 

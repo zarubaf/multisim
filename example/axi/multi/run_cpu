@@ -21,7 +21,7 @@ if ((compilation)); then
     $MULTISIM_SRC/multisim_client_push.sv \
     $MULTISIM_SRC/multisim_client_pull.sv \
     $MULTISIM_SRC/axi/multisim_client_axi_push.sv \
-    $MULTISIM_SRC/multisim_client.cpp $MULTISIM_SRC/socket_server/client.cpp
+    $MULTISIM_SRC/multisim_client.cpp $MULTISIM_SRC/socket_server/client.cpp # --trace --trace-structs
 else
   cd $output_dir
 

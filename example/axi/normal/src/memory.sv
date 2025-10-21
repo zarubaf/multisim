@@ -65,6 +65,8 @@ module memory
         if (i_axi_s_bready[cpu_idx] && (aw_queue.size() >= 1) && (w_queue.size() >= 1)) begin
           // update memory for write transactions
           memory_array[aw_queue[0].addr>>3] = w_queue[0].data;
+          $display("[cpu_%0d] MEM 0x%016x -> [0x%016x]", aw_queue[0].id, w_queue[0].data,
+                   aw_queue[0].addr);
           // respond to write transactions
           o_axi_s_b[cpu_idx].id   <= aw_queue[0].id;
           o_axi_s_b[cpu_idx].resp <= 0;
@@ -81,11 +83,14 @@ module memory
 
         // R
         if (i_axi_s_rready[cpu_idx] && (ar_queue.size() >= 1)) begin
-          // respond to write transactions
+          // respond to read transactions
           o_axi_s_r[cpu_idx].id   <= ar_queue[0].id;
           o_axi_s_r[cpu_idx].resp <= 0;
           o_axi_s_r[cpu_idx].data <= memory_array[ar_queue[0].addr>>3];
           o_axi_s_rvalid[cpu_idx] <= 1;
+          $display("[cpu_%0d] MEM 0x%016x <- [0x%016x] (%0d/%0d)", ar_queue[0].id,
+                   memory_array[ar_queue[0].addr>>3], ar_queue[0].addr, read_transaction_nb,
+                   TRANSACTION_NB);
           // remove processed transactions from queues
           ar_queue.pop_front();
           // update read transaction count

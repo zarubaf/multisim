@@ -69,8 +69,11 @@ module cpu
     o_axi_m_arvalid <= 0;
 
     // R
+    o_axi_m_rready  <= 1;
+    @(posedge clk);
     while (!i_axi_m_rvalid) @(posedge clk);
     rdata = i_axi_m_r.data;
+    o_axi_m_rready <= 0;
   endtask
 
   task static axi_write(input bit [AXI_ADDR_WIDTH-1:0] address,
@@ -122,19 +125,11 @@ module cpu
   end
 
   always_ff @(posedge clk) begin
-    if (read_transaction_nb < TRANSACTION_NB) begin
-      o_axi_m_bready <= bit'($urandom);
-      o_axi_m_rready <= bit'($urandom);
-    end else begin
-      o_axi_m_bready <= 0;
-      o_axi_m_rready <= 0;
-    end
-  end
-
-  always_ff @(posedge clk) begin
     o_axi_m_awvalid <= 0;
     o_axi_m_wvalid  <= 0;
+    o_axi_m_bready  <= 0;
     o_axi_m_arvalid <= 0;
+    o_axi_m_rready  <= 0;
 
     if (read_transaction_nb < TRANSACTION_NB) begin
       bit rwb = x[4];
@@ -148,12 +143,12 @@ module cpu
       if (rwb) begin
         bit [63:0] rdata;
         axi_read(address, rdata);
-        $display("[cpu_%0d] 0x%016x <- [0x%016x] (%0d/%0d)", cpu_index, rdata, address,
+        $display("[cpu_%0d] CPU 0x%016x <- [0x%016x] (%0d/%0d)", cpu_index, rdata, address,
                  read_transaction_nb, TRANSACTION_NB);
         read_transaction_nb++;
       end else begin
+        $display("[cpu_%0d] CPU 0x%016x -> [0x%016x]", cpu_index, x, address);
         axi_write(address, x, int'(aw_w_wait_cycles));
-        $display("[cpu_%0d] 0x%016x -> [0x%016x]", cpu_index, x, address);
       end
     end
   end

@@ -1,41 +1,62 @@
-module cpu_multisim_server (
+module cpu_multisim_server
+  import axi_pkg::*;
+(
     input bit clk,
     input bit [31:0] cpu_index,
-    // cpu -> noc
-    input bit data_cpu_to_noc_rdy,
-    output bit data_cpu_to_noc_vld,
-    output bit [63:0] data_cpu_to_noc,
-    // noc -> cpu
-    output bit data_noc_to_cpu_rdy,
-    input bit data_noc_to_cpu_vld,
-    input bit [63:0] data_noc_to_cpu
+
+    // manager AXI interface
+
+    output axi_aw_t o_axi_m_aw,
+    input  bit      i_axi_m_awready,
+    output bit      o_axi_m_awvalid,
+
+    output axi_w_t o_axi_m_w,
+    input  bit     i_axi_m_wready,
+    output bit     o_axi_m_wvalid,
+
+    input  axi_b_t i_axi_m_b,
+    output bit     o_axi_m_bready,
+    input  bit     i_axi_m_bvalid,
+
+    output axi_ar_t o_axi_m_ar,
+    input  bit      i_axi_m_arready,
+    output bit      o_axi_m_arvalid,
+
+    input  axi_r_t i_axi_m_r,
+    output bit     o_axi_m_rready,
+    input  bit     i_axi_m_rvalid
 );
 
-  string server_name_cpu_to_noc;
-  string server_name_noc_to_cpu;
+  string server_name;
   initial begin
-    $sformat(server_name_cpu_to_noc, "cpu_to_noc_%0d", cpu_index);
-    $sformat(server_name_noc_to_cpu, "noc_to_cpu_%0d", cpu_index);
+    $sformat(server_name, "cpu_%0d", cpu_index);
   end
 
-  multisim_server_pull #(
-      .DATA_WIDTH(64)
-  ) i_multisim_server_pull (
-      .clk        (clk),
-      .server_name(server_name_cpu_to_noc),
-      .data_rdy   (data_cpu_to_noc_rdy),
-      .data_vld   (data_cpu_to_noc_vld),
-      .data       (data_cpu_to_noc)
-  );
-
-  multisim_server_push #(
-      .DATA_WIDTH(64)
-  ) i_multisim_server_push (
-      .clk        (clk),
-      .server_name(server_name_noc_to_cpu),
-      .data_rdy   (data_noc_to_cpu_rdy),
-      .data_vld   (data_noc_to_cpu_vld),
-      .data       (data_noc_to_cpu)
+  multisim_server_axi_pull #(
+      .axi_aw_t(axi_aw_t),
+      .axi_w_t (axi_w_t),
+      .axi_b_t (axi_b_t),
+      .axi_ar_t(axi_ar_t),
+      .axi_r_t (axi_r_t)
+  ) i_multisim_server_axi_pull (
+      .clk            (clk),
+      .rst_n          (1),
+      .server_name    (server_name),
+      .o_axi_m_aw     (o_axi_m_aw),
+      .i_axi_m_awready(i_axi_m_awready),
+      .o_axi_m_awvalid(o_axi_m_awvalid),
+      .o_axi_m_w      (o_axi_m_w),
+      .i_axi_m_wready (i_axi_m_wready),
+      .o_axi_m_wvalid (o_axi_m_wvalid),
+      .i_axi_m_b      (i_axi_m_b),
+      .o_axi_m_bready (o_axi_m_bready),
+      .i_axi_m_bvalid (i_axi_m_bvalid),
+      .o_axi_m_ar     (o_axi_m_ar),
+      .i_axi_m_arready(i_axi_m_arready),
+      .o_axi_m_arvalid(o_axi_m_arvalid),
+      .i_axi_m_r      (i_axi_m_r),
+      .o_axi_m_rready (o_axi_m_rready),
+      .i_axi_m_rvalid (i_axi_m_rvalid)
   );
 
 endmodule
