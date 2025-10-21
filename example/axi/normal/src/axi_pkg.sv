@@ -19,7 +19,7 @@ package axi_pkg;
   } axi_aw_t;
 
   typedef struct packed {
-    bit [AXI_ID_WIDTH-1:0]   id;       // AXI3 only
+    bit [AXI_ID_WIDTH-1:0]   id;    // AXI3 only
     bit [AXI_DATA_WIDTH-1:0] data;
     bit [AXI_STRB_WIDTH-1:0] strb;
     bit                      last;
@@ -51,4 +51,3 @@ package axi_pkg;
   } axi_r_t;
 
 endpackage
-;
