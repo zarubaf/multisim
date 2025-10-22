@@ -18,7 +18,7 @@ extern "C" int multisim_server_send_data(char const *server_name,
                                          const svOpenArrayHandle data_handle,
                                          int data_width);
 
-#define MULTISIM_SERVER_MAX 256
+#define MULTISIM_SERVER_MAX 1024
 Server *server[MULTISIM_SERVER_MAX];
 int new_socket[MULTISIM_SERVER_MAX];
 int server_idx = 0;
