@@ -3,7 +3,6 @@
 import glob
 import re
 from dataclasses import dataclass
-from datetime import datetime
 import matplotlib.pyplot as plt
 
 
@@ -24,8 +23,10 @@ def get_sim_and_cpu_nb(filename):
 
 
 def time_str_to_time_in_sec(time_str):
-    pt = datetime.strptime(time_str, "%Mm%S.%fs")
-    total_seconds = pt.second + pt.minute * 60 + pt.hour * 3600
+    min_sec_str = time_str.split('.')[0]
+    minute = int(min_sec_str.split('m')[0])
+    second = int(min_sec_str.split('m')[1])
+    total_seconds = second + minute * 60
     return total_seconds
 
 
@@ -67,9 +68,12 @@ for f in glob.glob("*/batch_*/sim.log"):
     else:
         d_multi[cpu_nb] = simulation
 
-for cpu_nb in sorted(d_normal):
-    print(d_normal[cpu_nb])
-for cpu_nb in sorted(d_multi):
-    print(d_multi[cpu_nb])
+with open("sim_speed.txt", "w") as f:
+    for cpu_nb in sorted(d_normal):
+        print(d_normal[cpu_nb])
+        f.write(f"{d_normal[cpu_nb]}\n")
+    for cpu_nb in sorted(d_multi):
+        print(d_multi[cpu_nb])
+        f.write(f"{d_multi[cpu_nb]}\n")
 
 plot(d_normal, d_multi)
