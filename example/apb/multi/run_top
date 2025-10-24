@@ -15,7 +15,7 @@ verilator --binary -j 0                                                    \
   +incdir+$MULTISIM_SRC                                                    \
   $MULTISIM_SRC/multisim_server_push.sv                                    \
   $MULTISIM_SRC/multisim_server_pull.sv                                    \
-  $MULTISIM_SRC/axi/multisim_server_axi_pull.sv                            \
+  $MULTISIM_SRC/apb/multisim_server_apb_pull.sv                            \
   $MULTISIM_SRC/multisim_server.cpp $MULTISIM_SRC/socket_server/server.cpp \
   -GCPU_NB=$cpu_nb # --trace --trace-structs
 cat << EOF
