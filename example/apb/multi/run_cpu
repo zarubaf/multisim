@@ -1,0 +1,35 @@
+#!/bin/bash
+
+set -e
+
+compilation=0
+if [ "$1" = "compilation" ]; then
+  compilation=1
+fi
+cpu_index="$2"
+
+output_dir=output_cpu_$cpu_index
+
+if ((compilation)); then
+  mkdir -p $output_dir
+  cp -rfL src/* $output_dir
+  cd $output_dir
+
+  verilator --binary -j 0                 \
+    cpu_multisim_client.sv cpu.sv         \
+    +incdir+$MULTISIM_SRC                 \
+    $MULTISIM_SRC/multisim_client_push.sv \
+    $MULTISIM_SRC/multisim_client_pull.sv \
+    $MULTISIM_SRC/axi/multisim_client_axi_push.sv \
+    $MULTISIM_SRC/multisim_client.cpp $MULTISIM_SRC/socket_server/client.cpp # --trace --trace-structs
+else
+  cd $output_dir
+
+  cat << EOF
+
+  ----------------------------------------
+  -- simulation start
+  ----------------------------------------
+EOF
+  (time ./obj_dir/Vcpu_multisim_client +CPU_INDEX=$cpu_index) &> sim.log
+fi

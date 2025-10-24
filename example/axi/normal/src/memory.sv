@@ -33,7 +33,7 @@ module memory
 );
 
   bit [CPU_NB-1:0] transaction_done;
-  bit [63:0] memory_array[1024*CPU_NB];  // 1024 64b entries per CPU
+  bit [AXI_DATA_WIDTH-1:0] memory_array[1024*CPU_NB];  // 1024 entries per CPU
 
 
   for (genvar cpu_idx = 0; cpu_idx < CPU_NB; cpu_idx++) begin : gen_cpu
