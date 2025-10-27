@@ -9,14 +9,16 @@ mkdir -p output_top
 cp -rfL src/* output_top
 cd output_top
 
-verilator --binary -j 0                                                    \
-  +define+MULTISIM                                                         \
-  top.sv memory.sv cpu_multisim_server.sv                                  \
-  +incdir+$MULTISIM_SRC                                                    \
-  $MULTISIM_SRC/multisim_server_push.sv                                    \
-  $MULTISIM_SRC/multisim_server_pull.sv                                    \
-  $MULTISIM_SRC/apb/multisim_server_apb_pull.sv                            \
-  $MULTISIM_SRC/multisim_server.cpp $MULTISIM_SRC/socket_server/server.cpp \
+verilator --binary -j 0                         \
+  +define+MULTISIM                              \
+  top.sv memory.sv cpu_multisim_server.sv       \
+  +incdir+$MULTISIM_SRC                         \
+  $MULTISIM_SRC/multisim_server_push.sv         \
+  $MULTISIM_SRC/multisim_server_pull.sv         \
+  +incdir+$MULTISIM_SRC/apb                     \
+  $MULTISIM_SRC/apb/multisim_server_apb_pull.sv \
+  $MULTISIM_SRC/multisim_server.cpp             \
+  $MULTISIM_SRC/socket_server/server.cpp        \
   -GCPU_NB=$cpu_nb # --trace --trace-structs
 cat << EOF
 

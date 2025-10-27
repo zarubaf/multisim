@@ -1,3 +1,5 @@
+`include "multisim_apb_fsm.sv"
+
 module multisim_client_apb_push #(
     parameter string SERVER_RUNTIME_DIRECTORY = "../output_top",
     parameter type   apb_req_t,
@@ -16,7 +18,6 @@ module multisim_client_apb_push #(
     output bit o_apb_s_pready
 );
 
-
   string server_name_apb_req;
   string server_name_apb_resp;
   initial begin
@@ -27,28 +28,15 @@ module multisim_client_apb_push #(
   wire clk_gated;
   assign clk_gated = clk & rst_n;
 
-  // APB state machine:
-  typedef enum logic [3:0] {
-    IDLE   = 4'b0001,
-    SETUP  = 4'b0010,
-    ACCESS = 4'b0100
-  } apb_state_t;
+  multisim_apb_state_t state;
 
-  apb_state_t state, next_state;
-
-  bit apb_s_pready_d1;
-  always_ff @(posedge clk_gated) begin
-    apb_s_pready_d1 <= o_apb_s_pready;
-  end
-
-  always_comb begin : next_state_logic
-    case (state)
-      IDLE: next_state = i_apb_s_psel ? SETUP : IDLE;
-      SETUP: next_state = ACCESS;
-      ACCESS: next_state = apb_s_pready_d1 ? (i_apb_s_psel ? SETUP : IDLE) : ACCESS;
-      default: next_state = IDLE;
-    endcase
-  end
+  multisim_apb_fsm i_multisim_apb_fsm (
+      .clk         (clk),
+      .rst_n       (rst_n),
+      .i_apb_pready(o_apb_s_pready),
+      .i_apb_psel  (i_apb_s_psel),
+      .state       (state)
+  );
 
   wire request_rdy;
   bit request_vld;
@@ -57,7 +45,7 @@ module multisim_client_apb_push #(
   assign o_apb_s_pready = response_vld;
 
   always_comb begin
-    case (next_state)
+    case (state)
       IDLE: request_vld = 1'b0;
       SETUP: request_vld = 1'b1;
       ACCESS: begin
@@ -65,10 +53,6 @@ module multisim_client_apb_push #(
       end
       default: request_vld = 1'b0;
     endcase
-  end
-
-  always_ff @(posedge clk_gated) begin
-    state <= next_state;
   end
 
   // request

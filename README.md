@@ -123,4 +123,6 @@ Cons:
 * harder debug: waveforms split on N+1 simulation, no time coherency in between them
 
 # 🚀 future
+* X/Z support
+* self checking examples
 * simple transaction logging to help debug
