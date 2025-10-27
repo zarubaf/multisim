@@ -35,23 +35,41 @@ module multisim_server_apb_pull #(
 
   apb_state_t state, next_state;
 
+  bit apb_s_pready_d1;
+  always_ff @(posedge clk_gated) begin
+    apb_s_pready_d1 <= i_apb_m_pready;
+  end
+
   always_comb begin : next_state_logic
     case (state)
       IDLE: next_state = request_vld ? SETUP : IDLE;
       SETUP: next_state = ACCESS;
-      ACCESS: next_state = i_apb_m_pready ? (request_vld ? SETUP : IDLE) : ACCESS;
+      ACCESS: next_state = apb_s_pready_d1 ? (request_vld ? SETUP : IDLE) : ACCESS;
       default: next_state = IDLE;
+    endcase
+  end
+
+  bit request_rdy;
+  wire request_vld;
+  apb_req_t request_data;
+  wire response_rdy;
+  wire response_vld = i_apb_m_pready && (next_state == ACCESS);
+
+  always_comb begin
+    case (next_state)
+      IDLE: request_rdy = 1'b1;
+      SETUP: begin
+        request_rdy = 1'b1;
+        o_apb_m_req = request_data;
+      end
+      ACCESS: request_rdy = 1'b0;
+      default: request_rdy = 1'b0;
     endcase
   end
 
   always_ff @(posedge clk_gated) begin
     state <= next_state;
   end
-
-  wire request_rdy = i_apb_m_pready;
-  wire request_vld;
-  wire response_rdy;
-  wire response_vld = i_apb_m_pready && (next_state == ACCESS);
 
   assign o_apb_m_psel = next_state != IDLE;
   assign o_apb_m_penable = next_state == ACCESS;
@@ -64,7 +82,7 @@ module multisim_server_apb_pull #(
       .server_name(server_name_apb_req),
       .data_rdy   (request_rdy),
       .data_vld   (request_vld),
-      .data       (o_apb_m_req)
+      .data       (request_data)
   );
 
   // response

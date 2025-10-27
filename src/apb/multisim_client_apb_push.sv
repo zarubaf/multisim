@@ -36,24 +36,40 @@ module multisim_client_apb_push #(
 
   apb_state_t state, next_state;
 
+  bit apb_s_pready_d1;
+  always_ff @(posedge clk_gated) begin
+    apb_s_pready_d1 <= o_apb_s_pready;
+  end
+
   always_comb begin : next_state_logic
     case (state)
       IDLE: next_state = i_apb_s_psel ? SETUP : IDLE;
       SETUP: next_state = ACCESS;
-      ACCESS: next_state = o_apb_s_pready ? (i_apb_s_psel ? SETUP : IDLE) : ACCESS;
+      ACCESS: next_state = apb_s_pready_d1 ? (i_apb_s_psel ? SETUP : IDLE) : ACCESS;
       default: next_state = IDLE;
+    endcase
+  end
+
+  wire request_rdy;
+  bit request_vld;
+  wire response_rdy = 1;
+  wire response_vld;
+  assign o_apb_s_pready = response_vld;
+
+  always_comb begin
+    case (next_state)
+      IDLE: request_vld = 1'b0;
+      SETUP: request_vld = 1'b1;
+      ACCESS: begin
+        if (request_rdy) request_vld = 1'b0;
+      end
+      default: request_vld = 1'b0;
     endcase
   end
 
   always_ff @(posedge clk_gated) begin
     state <= next_state;
   end
-
-  wire request_rdy;
-  wire request_vld = next_state == SETUP;
-  wire response_rdy = request_rdy && (next_state == ACCESS);
-  wire response_vld;
-  assign o_apb_s_pready = response_vld;
 
   // request
   multisim_client_push #(
