@@ -1,0 +1,1 @@
+../../normal/src/irq_loopback.sv
