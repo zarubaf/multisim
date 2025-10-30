@@ -7,8 +7,9 @@ module cpu #(
     input bit clk,
     input bit [31:0] cpu_index,
 
-    input  bit [31:0] i_irq,
-    output bit [31:0] o_irq
+    input bit [31:0] i_irq,
+    output bit [31:0] o_irq,
+    output bit o_finish
 );
 
   function automatic bit [63:0] xorshift64star(input bit [63:0] x, input bit [31:0] iterations = 1);
@@ -44,6 +45,8 @@ module cpu #(
                  TRANSACTION_NB);
         received_irq_nb++;
       end
+    end else begin
+      o_finish <= 1;
     end
   end
 

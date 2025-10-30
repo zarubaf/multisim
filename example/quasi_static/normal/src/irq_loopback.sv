@@ -7,10 +7,9 @@ module irq_loopback #(
     input bit clk,
 
     input  bit [31:0] i_irq[CPU_NB],
-    output bit [31:0] o_irq[CPU_NB]
+    output bit [31:0] o_irq[CPU_NB],
+    output bit [CPU_NB-1:0] i_finish
 );
-
-  bit [CPU_NB-1:0] transaction_done;
 
   for (genvar cpu_idx = 0; cpu_idx < CPU_NB; cpu_idx++) begin : gen_cpu
     bit [31:0] i_irq_prev = 0;
@@ -25,14 +24,12 @@ module irq_loopback #(
                    received_irq_nb, TRANSACTION_NB);
           received_irq_nb++;
         end
-      end else begin
-        transaction_done[cpu_idx] <= 1'b1;
       end
     end
   end
 
   initial begin
-    wait (transaction_done == {CPU_NB{1'b1}});
+    wait (i_finish == {CPU_NB{1'b1}});
     repeat (2) @(posedge clk);
     $finish;
   end
