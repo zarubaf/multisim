@@ -1,7 +1,13 @@
-🏁 speed: simulate your RTL with real multi-threaded speed  
-🧱 interoperability: interface different simulators and chips together
+<div align="center">
+
+<img alt="Multisim" height="280" src="./.assets/multisim_light.png" />
+
+simulate your RTL with real multi-threaded speed  
+interface different simulators and chiplets together
+</div>
 
 # 💡 rationale
+
 RTL simulations:
 * are typically single threaded and don't scale well when your DUT size increases
 * run in 1 simulation environment, which makes it hard to simulate multiple chips together
@@ -31,6 +37,15 @@ Reusing [this example](./example/noc/multi/src) where we have:
 ![sim speed](./example/noc/sim_speed.png)
 
 # ⚙ usage
+## available modules
+* core library (ready/valid protocol)
+    * `client->server`: [multisim_client_push](./src/core/multisim_client_push.sv) and [multisim_server_pull](./src/core/multisim_server_pull.sv)
+    * `server->client`: [multisim_server_push](./src/core/multisim_server_push.sv) and [multisim_client_pull](./src/core/multisim_client_pull.sv)
+* other protocols:
+  * [axi](./src/axi/)
+  * [apb](./src/apb/)
+  * [quasi static signals](./src/quasi_static/) (useful for signals without control signals like IRQ)
+
 ## testbench
 ### example
 See the following files from the [example](./example/noc/multi/src):
@@ -40,63 +55,15 @@ See the following files from the [example](./example/noc/multi/src):
 
 ### channels
 * **server simulation** and **client simulations** communicate through channels
-* channels use a `rdy/vld` protocol to exchange `DATA_WIDTH` bits
-* channels direction can be:
-  * `client->server`: `multisim_client_push()` + `multisim_server_pull()`
-  * `server->client`: `multisim_client_pull()` + `multisim_server_push()`
-* those modules need a unique `server_name` to link a client/server channel together
+* channels direction can be `client->server` or `server->client`
+* each **simulation** can use mulitple channels
+* `multisim` modules need a unique `server_name` to link a client/server channel together
 * client modules need to set `SERVER_RUNTIME_DIRECTORY` to know the port/ip address of each channel
-* each **client simulation** can use mulitple channels to communicate with the **server simulation**
 
 ### end of simulation
 * **server simulation** can stop the simulation normally (`$finish`, etc)
 * **client simulations** must not stop the simulation themselves
   * they will automatically be stopped when the **server simulation** is done
-
-### modules
-```verilog
-// client->server
-module multisim_client_push #(
-    parameter string SERVER_RUNTIME_DIRECTORY = "../output_top",
-    parameter int DATA_WIDTH = 64
-) (
-    input bit clk,
-    input string server_name,
-    output bit data_rdy,
-    input bit data_vld,
-    input bit [DATA_WIDTH-1:0] data
-);
-module multisim_server_pull #(
-    parameter int DATA_WIDTH = 64
-) (
-    input bit clk,
-    input string server_name,
-    input bit data_rdy,
-    output bit data_vld,
-    output bit [DATA_WIDTH-1:0] data
-);
-
-// server->client
-module multisim_server_push #(
-    parameter int DATA_WIDTH = 64
-) (
-    input bit clk,
-    input string server_name,
-    output bit data_rdy,
-    input bit data_vld,
-    input bit [DATA_WIDTH-1:0] data
-);
-module multisim_client_pull #(
-    parameter string SERVER_RUNTIME_DIRECTORY = "../output_top",
-    parameter int DATA_WIDTH = 64
-) (
-    input bit clk,
-    input string server_name,
-    input bit data_rdy,
-    output bit data_vld,
-    output bit [DATA_WIDTH-1:0] data
-);
-````
 
 ## compilation
 1. source [env.sh](./env.sh)
