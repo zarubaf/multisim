@@ -45,7 +45,7 @@ endfunction
 // end of simulation
 //-----------------------------------------------------------
 final begin
-  string server_exit_file = "./multisim/server_exit";
+  string server_exit_file = "multisim/server_exit";
   int fp;
   fp = $fopen(server_exit_file, "w");
   if (fp == 0) begin

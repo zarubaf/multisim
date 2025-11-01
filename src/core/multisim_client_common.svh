@@ -46,46 +46,17 @@ function automatic int multisim_client_send_data_packed(
 endfunction
 
 //-----------------------------------------------------------
-// end of simulation
-//-----------------------------------------------------------
-initial begin
-  multisim_client_end_of_simulation eos;
-  eos = new();
-
-  // make sure only 1 process handles eos to improve performance
-  @(posedge clk);
-  if (eos.handles_end_of_simulation()) begin
-    string server_exit_file = {SERVER_RUNTIME_DIRECTORY, "/multisim/server_exit"};
-    int fp;
-    int check_every_n_cycles;
-    if (!$value$plusargs("MULTISIM_EOS_CHECK_EVERY_N_CYCLES=%d", check_every_n_cycles)) begin
-      check_every_n_cycles = 1000;
-    end
-
-    forever begin
-      repeat (check_every_n_cycles) begin
-        @(posedge clk);
-      end
-      fp = $fopen(server_exit_file, "r");  // can be checked ~2M times/sec on Verilator
-      if (fp != 0) begin
-        $fclose(fp);
-        $display("multisim_client: end of simulation");
-        $finish;
-      end
-    end
-  end
-end
-
-//-----------------------------------------------------------
 // functions/tasks
 //-----------------------------------------------------------
+function automatic int multisim_fopen(input string filename, input bit [4*8-1:0] mode);
+  return $fopen({SERVER_RUNTIME_DIRECTORY, "/multisim/", filename}, mode);
+endfunction
+
 function automatic int get_server_address_and_port(
-    input string server_runtime_directory, input string server_name, output string server_address,
-    output int server_port);
+    input string server_name, output string server_address, output int server_port);
   int fp;
   string garbage;
-  string server_file = {server_runtime_directory, "/multisim/server_", server_name, ".txt"};
-  fp = $fopen(server_file, "r");
+  fp = multisim_fopen({"server_", server_name, ".txt"}, "r");
   if (fp == 0) begin
     return 0;
   end
@@ -100,12 +71,11 @@ function automatic int get_server_address_and_port(
   return 1;
 endfunction
 
-function automatic void connnect_to_server(input string server_runtime_directory,
-                                           input string server_name);
+function automatic void connnect_to_server(input string server_name);
   string server_address;
   int server_port;
   while (get_server_address_and_port(
-      server_runtime_directory, server_name, server_address, server_port
+      server_name, server_address, server_port
   ) != 1) begin
     ;
   end
@@ -118,3 +88,33 @@ function automatic void connnect_to_server(input string server_runtime_directory
     ;
   end
 endfunction
+
+//-----------------------------------------------------------
+// end of simulation
+//-----------------------------------------------------------
+initial begin
+  multisim_client_end_of_simulation eos;
+  eos = new();
+
+  // make sure only 1 process handles eos to improve performance
+  @(posedge clk);
+  if (eos.handles_end_of_simulation()) begin
+    int check_every_n_cycles;
+    if (!$value$plusargs("MULTISIM_EOS_CHECK_EVERY_N_CYCLES=%d", check_every_n_cycles)) begin
+      check_every_n_cycles = 1000;
+    end
+
+    forever begin
+      int fp;
+      repeat (check_every_n_cycles) begin
+        @(posedge clk);
+      end
+      fp = multisim_fopen("server_exit", "r");  // can be checked ~2M times/sec on Verilator
+      if (fp != 0) begin
+        $fclose(fp);
+        $display("multisim_client: end of simulation");
+        $finish;
+      end
+    end
+  end
+end
