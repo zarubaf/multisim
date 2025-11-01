@@ -9,8 +9,7 @@ ulimit -s $((ulimit_factor * 8192)) # stack size in kB
 ulimit -u $((ulimit_factor * 4096)) # max user processes
 
 # 1- clean server files
-rm -f output_top/server_*.txt
-rm -f output_top/server_exit
+rm -rf output_top/multisim
 
 # 2- start clients
 # -- compilation

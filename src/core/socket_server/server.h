@@ -13,6 +13,7 @@
 #include <unistd.h>
 
 #define BASE_PORT 8100
+#define SERVERNAME_MAX_SIZE 200
 #define FILENAME_MAX_SIZE 256
 
 /**
@@ -25,18 +26,19 @@
  */
 class Server {
 public:
-  Server(char const *name);
+  Server(char const *info_dir, char const *name);
   void start();
   int acceptNewSocket();
   char const *serverName;
   char const *serverIp;
   int serverPort;
-  char serverInfoFile[FILENAME_MAX_SIZE + 1];
+  char serverInfoFile[FILENAME_MAX_SIZE];
 
 private:
   int server_fd;
   struct sockaddr_in address;
   int addrlen = sizeof(address);
+  char const *serverInfoDir;
   bool serverIsRunning = false;
   char const *getIp();
   static std::set<char const *> serverNameSet;

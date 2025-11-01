@@ -2,13 +2,14 @@
 
 std::set<char const *> Server::serverNameSet;
 
-Server::Server(char const *name) : serverName(name) {
-  if (Server::serverNameSet.find(name) != Server::serverNameSet.end()) {
-    fprintf(stderr, "ERROR: server name [%s] already exist, use another name\n",
-            name);
+Server::Server(char const *info_dir, char const *name) : serverInfoDir(info_dir), serverName(name) {
+  char *name_copy = new char[SERVERNAME_MAX_SIZE];
+  strcpy(name_copy, name);
+  if (Server::serverNameSet.find(name_copy) != Server::serverNameSet.end()) {
+    fprintf(stderr, "ERROR: server name [%s] already exist, use another name\n", name_copy);
     exit(EXIT_FAILURE);
   }
-  Server::serverNameSet.insert(name);
+  Server::serverNameSet.insert(name_copy);
 }
 
 void Server::start() {
@@ -17,8 +18,7 @@ void Server::start() {
 
   // create server
   if (serverIsRunning) {
-    fprintf(stderr, "ERROR: server [%s] start() has already been called\n",
-            serverName);
+    fprintf(stderr, "ERROR: server [%s] start() has already been called\n", serverName);
     exit(EXIT_FAILURE);
   }
   if ((server_fd = socket(AF_INET, SOCK_NONBLOCK | SOCK_STREAM, 0)) == 0) {
@@ -42,8 +42,8 @@ void Server::start() {
   serverIsRunning = true;
 
   // print server's ip and port
-  mkdir("multisim", 0777);
-  snprintf(serverInfoFile, FILENAME_MAX_SIZE, "multisim/server_%s.txt", serverName);
+  mkdir(serverInfoDir, 0777);
+  snprintf(serverInfoFile, FILENAME_MAX_SIZE, "%s/server_%s.txt", serverInfoDir, serverName);
   fp = fopen(serverInfoFile, "w+");
   fprintf(fp, "ip: %s\n", serverIp);
   fprintf(fp, "port: %0d\n", serverPort);
@@ -54,8 +54,7 @@ void Server::start() {
 
 int Server::acceptNewSocket() {
   int new_socket;
-  new_socket =
-      accept(server_fd, (struct sockaddr *)&address, (socklen_t *)&addrlen);
+  new_socket = accept(server_fd, (struct sockaddr *)&address, (socklen_t *)&addrlen);
   fcntl(new_socket, F_SETFL, O_NONBLOCK);
   return new_socket;
 }

@@ -27,3 +27,24 @@ int Client::start(char const *server_address, int server_port) {
 }
 
 int Client::getSocket() { return new_socket; }
+
+// TODO: cleanup, this function is duplicated, see server.cpp
+char const *Client::getIp() {
+  setenv("LANG", "C", 1);
+  FILE *fp = popen("hostname -i", "r");
+  if (fp) {
+    char *p = NULL;
+    size_t n;
+    while ((getline(&p, &n, fp) > 0) && p) {
+      char *pos;
+      // stop at 1st '\n' or ' '
+      if ((pos = strchr(p, ' ')) != NULL)
+        *pos = '\0';
+      if ((pos = strchr(p, '\n')) != NULL)
+        *pos = '\0';
+      return p;
+    }
+  }
+  pclose(fp);
+  return NULL;
+}

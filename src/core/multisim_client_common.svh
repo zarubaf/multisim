@@ -79,9 +79,6 @@ function automatic void connnect_to_server(input string server_name);
   ) != 1) begin
     ;
   end
-  $display("multisim_client: server_name=%s server_address=%s server_port=%d", server_name,
-           server_address, server_port);
-  $fflush;
   while (multisim_client_start(
       server_name, server_address, server_port
   ) != 1) begin

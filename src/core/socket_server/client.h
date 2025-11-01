@@ -19,6 +19,7 @@ public:
   Client(char const *name);
   int start(char const *server_address, int server_port);
   int getSocket();
+  char const *getIp();
 
 private:
   int new_socket;
