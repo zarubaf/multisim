@@ -1,6 +1,6 @@
 #include "client.h"
 
-Client::Client(char const *name){};
+Client::Client(char const *name) {};
 
 int Client::start(char const *server_address, int server_port) {
   struct sockaddr_in serv_addr;
@@ -16,8 +16,7 @@ int Client::start(char const *server_address, int server_port) {
     // printf("\nInvalid address/ Address not supported \n");
     return 0;
   }
-  if (connect(new_socket, (struct sockaddr *)&serv_addr, sizeof(serv_addr)) <
-      0) {
+  if (connect(new_socket, (struct sockaddr *)&serv_addr, sizeof(serv_addr)) < 0) {
     // printf("\nConnection Failed \n");
     return 0;
   }
