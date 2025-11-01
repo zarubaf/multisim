@@ -42,7 +42,8 @@ void Server::start() {
   serverIsRunning = true;
 
   // print server's ip and port
-  snprintf(serverInfoFile, FILENAME_MAX_SIZE, "server_%s.txt", serverName);
+  mkdir("multisim", 0777);
+  snprintf(serverInfoFile, FILENAME_MAX_SIZE, "multisim/server_%s.txt", serverName);
   fp = fopen(serverInfoFile, "w+");
   fprintf(fp, "ip: %s\n", serverIp);
   fprintf(fp, "port: %0d\n", serverPort);

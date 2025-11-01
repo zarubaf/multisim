@@ -55,7 +55,7 @@ initial begin
   // make sure only 1 process handles eos to improve performance
   @(posedge clk);
   if (eos.handles_end_of_simulation()) begin
-    string server_exit_file = {SERVER_RUNTIME_DIRECTORY, "/server_exit"};
+    string server_exit_file = {SERVER_RUNTIME_DIRECTORY, "/multisim/server_exit"};
     int fp;
     int check_every_n_cycles;
     if (!$value$plusargs("MULTISIM_EOS_CHECK_EVERY_N_CYCLES=%d", check_every_n_cycles)) begin
@@ -84,7 +84,7 @@ function automatic int get_server_address_and_port(
     output int server_port);
   int fp;
   string garbage;
-  string server_file = {server_runtime_directory, "/server_", server_name, ".txt"};
+  string server_file = {server_runtime_directory, "/multisim/server_", server_name, ".txt"};
   fp = $fopen(server_file, "r");
   if (fp == 0) begin
     return 0;
