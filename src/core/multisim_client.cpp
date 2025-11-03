@@ -10,8 +10,8 @@
 
 using namespace std;
 
-extern "C" int multisim_client_start(char const *server_name, char const *server_address,
-                                     int server_port);
+extern "C" void multisim_client_start(char const *server_runtime_directory,
+                                      char const *server_name);
 extern "C" int multisim_client_send_data(char const *server_name,
                                          const svOpenArrayHandle data_handle, int data_width);
 extern "C" int multisim_client_get_data(char const *server_name, svOpenArrayHandle data_handle,
@@ -22,7 +22,26 @@ int sockets[MULTISIM_SERVER_MAX];
 int server_idx = 0;
 map<string, int> server_name_to_idx;
 
-int multisim_client_start(char const *server_name, char const *server_address, int server_port) {
+int get_server_address_and_port(char const *server_runtime_directory, char const *server_name,
+                                string &server_address, int &server_port) {
+  string garbage;
+  string server_file;
+  server_file =
+      string(server_runtime_directory) + "/multisim/server_" + string(server_name) + ".txt";
+  FILE *fp = fopen(server_file.c_str(), "r");
+  if (fp == NULL) {
+    return 0;
+  }
+  char ip_str[64];
+  fscanf(fp, "%s %s", &garbage[0], &ip_str[0]); // read "ip: xxx.xxx.xxx.xxx"
+  server_address = string(ip_str);
+  fscanf(fp, "%s %d", &garbage[0], &server_port); // read "port: xxxxx"
+  fclose(fp);
+  return 1;
+}
+
+int client_start(string server_runtime_directory, char const *server_name,
+                 char const *server_address, int server_port) {
   Client *client = new Client(server_name);
   assert(server_idx < MULTISIM_SERVER_MAX);
 
@@ -34,22 +53,40 @@ int multisim_client_start(char const *server_name, char const *server_address, i
   server_name_to_idx[server_name] = server_idx;
 
   // dump info
-  char const *client_info_file = "multisim_client.txt";
+  string first_server_name = server_name_to_idx.begin()->first;
+  string client_info_file =
+      string(server_runtime_directory) + "/multisim/client_" + first_server_name + ".txt";
   FILE *fp;
   if (server_idx == 0) {
-    fp = fopen(client_info_file, "w");
+    fp = fopen(client_info_file.c_str(), "w");
     fprintf(fp, "ip: %s\n", client->getIp());
     fprintf(fp, "pid: %0d\n", getpid());
   } else {
-    fp = fopen(client_info_file, "a");
+    fp = fopen(client_info_file.c_str(), "a");
   }
   fprintf(fp, "server_%0d: %s %s %0d\n", server_idx, server_name, server_address, server_port);
   fflush(fp);
   fclose(fp);
-  printf("multisim_client_start: [%s] has started, info in %s\n", server_name, client_info_file);
+  printf("multisim_client_start: [%s] has started, info in %s\n", server_name,
+         client_info_file.c_str());
 
   server_idx++;
   return 1;
+}
+
+void multisim_client_start(char const *server_runtime_directory, char const *server_name) {
+  string server_address;
+  int server_port;
+  while (!get_server_address_and_port(server_runtime_directory, server_name, server_address,
+                                      server_port)) {
+    usleep(100000); // wait for 0.1s
+  };
+  printf("multisim_client_start: connect to server %s at %s:%0d\n", server_name,
+         server_address.c_str(), server_port);
+  while (
+      !client_start(server_runtime_directory, server_name, server_address.c_str(), server_port)) {
+    usleep(100000); // wait for 0.1s
+  };
 }
 
 // #define SIMULATE_SEND_FAIL_CLIENT

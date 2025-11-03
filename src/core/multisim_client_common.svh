@@ -3,10 +3,9 @@
 //-----------------------------------------------------------
 localparam int Data32bWidth = (DATA_WIDTH + 31) / 32;
 
-import "DPI-C" function int multisim_client_start(
-  string server_name,
-  string server_address,
-  int server_port
+import "DPI-C" function void multisim_client_start(
+  input string server_runtime_directory,
+  input string server_name
 );
 import "DPI-C" function int multisim_client_get_data(
   string server_name,
@@ -50,40 +49,6 @@ endfunction
 //-----------------------------------------------------------
 function automatic int multisim_fopen(input string filename, input bit [4*8-1:0] mode);
   return $fopen({SERVER_RUNTIME_DIRECTORY, "/multisim/", filename}, mode);
-endfunction
-
-function automatic int get_server_address_and_port(
-    input string server_name, output string server_address, output int server_port);
-  int fp;
-  string garbage;
-  fp = multisim_fopen({"server_", server_name, ".txt"}, "r");
-  if (fp == 0) begin
-    return 0;
-  end
-  $fscanf(fp, "%s %s", garbage, server_address);
-  $fscanf(fp, "%s %d", garbage, server_port);
-  // in case file is being written while being read
-  if ((server_address == "") || (server_port == 0)) begin
-    $fclose(fp);
-    return 0;
-  end
-  $fclose(fp);
-  return 1;
-endfunction
-
-function automatic void connnect_to_server(input string server_name);
-  string server_address;
-  int server_port;
-  while (get_server_address_and_port(
-      server_name, server_address, server_port
-  ) != 1) begin
-    ;
-  end
-  while (multisim_client_start(
-      server_name, server_address, server_port
-  ) != 1) begin
-    ;
-  end
 endfunction
 
 //-----------------------------------------------------------
