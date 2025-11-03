@@ -1,26 +1,40 @@
 #include "client.h"
+#include <string>
+using namespace std;
 
-Client::Client(char const *name) {};
+Client::Client(char const *server_info_dir, char const *name)
+    : serverInfoDir(server_info_dir), serverName(name) {};
 
-int Client::start(char const *server_address, int server_port) {
+void Client::start() {
+  string server_file = string(serverInfoDir) + "/server_" + string(serverName) + ".txt";
+  printf("Client: waiting for server %s info file %s\n", serverName, server_file.c_str());
+  while (!getServerIpAndPort(server_file.c_str())) {
+    usleep(100000); // wait for 0.1s
+  };
+  printf("Client: connect to server %s at %s:%0d\n", serverName, serverIp, serverPort);
+  while (!startWithAddressAndPort(serverIp, serverPort)) {
+    usleep(100000); // wait for 0.1s
+  };
+}
+
+int Client::startWithAddressAndPort(char const *server_address, int server_port) {
   struct sockaddr_in serv_addr;
   // connect to server
   if ((new_socket = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
-    // printf("\n Socket creation error \n");
     return 0;
   }
   memset(&serv_addr, '0', sizeof(serv_addr));
   serv_addr.sin_family = AF_INET;
   serv_addr.sin_port = htons(server_port);
   if (inet_pton(AF_INET, server_address, &serv_addr.sin_addr) <= 0) {
-    // printf("\nInvalid address/ Address not supported \n");
     return 0;
   }
   if (connect(new_socket, (struct sockaddr *)&serv_addr, sizeof(serv_addr)) < 0) {
-    // printf("\nConnection Failed \n");
     return 0;
   }
   fcntl(new_socket, F_SETFL, O_NONBLOCK);
+
+  clientIp = getIp();
 
   return 1;
 }
@@ -46,4 +60,19 @@ char const *Client::getIp() {
   }
   pclose(fp);
   return NULL;
+}
+
+int Client::getServerIpAndPort(char const *server_file) {
+  FILE *fp = fopen(server_file, "r");
+  char garbage[128];
+  char ip_str[128];
+  if (fp == NULL) {
+    return 0;
+  }
+  fscanf(fp, "%s %s", &garbage[0], &ip_str[0]); // read "ip: xxx.xxx.xxx.xxx"
+  serverIp = (char *) malloc(128);
+  strcpy((char *)serverIp, &ip_str[0]);
+  fscanf(fp, "%s %d", &garbage[0], &serverPort); // read "port: xxxxx"
+  fclose(fp);
+  return 1;
 }

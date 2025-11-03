@@ -16,12 +16,19 @@
  */
 class Client {
 public:
-  Client(char const *name);
-  int start(char const *server_address, int server_port);
+  Client(char const *server_info_dir, char const *name);
+  void start();
+  int startWithAddressAndPort(char const *server_address, int server_port);
   int getSocket();
-  char const *getIp();
+  char const *clientIp;
+  char const *serverName;
+  char const *serverInfoDir;
+  char const *serverIp;
+  int serverPort;
 
 private:
+  char const *getIp();
   int new_socket;
+  int getServerIpAndPort(char const *server_file);
 };
 #endif

@@ -2,7 +2,8 @@
 
 std::set<char const *> Server::serverNameSet;
 
-Server::Server(char const *info_dir, char const *name) : serverInfoDir(info_dir), serverName(name) {
+Server::Server(char const *server_info_dir, char const *name)
+    : serverInfoDir(server_info_dir), serverName(name) {
   char *name_copy = new char[SERVERNAME_MAX_SIZE];
   strcpy(name_copy, name);
   if (Server::serverNameSet.find(name_copy) != Server::serverNameSet.end()) {

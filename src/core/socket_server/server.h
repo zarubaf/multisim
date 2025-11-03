@@ -26,10 +26,11 @@
  */
 class Server {
 public:
-  Server(char const *info_dir, char const *name);
+  Server(char const *server_info_dir, char const *name);
   void start();
   int acceptNewSocket();
   char const *serverName;
+  char const *serverInfoDir;
   char const *serverIp;
   int serverPort;
   char serverInfoFile[FILENAME_MAX_SIZE];
@@ -38,7 +39,6 @@ private:
   int server_fd;
   struct sockaddr_in address;
   int addrlen = sizeof(address);
-  char const *serverInfoDir;
   bool serverIsRunning = false;
   char const *getIp();
   static std::set<char const *> serverNameSet;
