@@ -14,7 +14,6 @@
 
 #define BASE_PORT 8100
 #define SERVERNAME_MAX_SIZE 200
-#define FILENAME_MAX_SIZE 256
 
 /**
  * Implementation of a non-blocking socket server
@@ -33,7 +32,6 @@ public:
   char const *serverInfoDir;
   char const *serverIp;
   int serverPort;
-  char serverInfoFile[FILENAME_MAX_SIZE];
 
 private:
   int server_fd;

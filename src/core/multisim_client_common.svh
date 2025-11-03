@@ -45,13 +45,6 @@ function automatic int multisim_client_send_data_packed(
 endfunction
 
 //-----------------------------------------------------------
-// functions/tasks
-//-----------------------------------------------------------
-function automatic int multisim_fopen(input string filename, input bit [4*8-1:0] mode);
-  return $fopen({SERVER_RUNTIME_DIRECTORY, "/multisim/", filename}, mode);
-endfunction
-
-//-----------------------------------------------------------
 // end of simulation
 //-----------------------------------------------------------
 initial begin
@@ -71,7 +64,8 @@ initial begin
       repeat (check_every_n_cycles) begin
         @(posedge clk);
       end
-      fp = multisim_fopen("server_exit", "r");  // can be checked ~2M times/sec on Verilator
+      // can be checked ~2M times/sec on Verilator
+      fp = $fopen({SERVER_RUNTIME_DIRECTORY, "/multisim/server_exit"}, "r");
       if (fp != 0) begin
         $fclose(fp);
         $display("multisim_client: end of simulation");

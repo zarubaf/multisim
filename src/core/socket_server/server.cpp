@@ -1,4 +1,6 @@
 #include "server.h"
+#include <string>
+using namespace std;
 
 std::set<char const *> Server::serverNameSet;
 
@@ -16,6 +18,7 @@ Server::Server(char const *server_info_dir, char const *name)
 void Server::start() {
   int i = 0;
   FILE *fp;
+  string server_info_file;
 
   // create server
   if (serverIsRunning) {
@@ -44,13 +47,13 @@ void Server::start() {
 
   // print server's ip and port
   mkdir(serverInfoDir, 0777);
-  snprintf(serverInfoFile, FILENAME_MAX_SIZE, "%s/server_%s.txt", serverInfoDir, serverName);
-  fp = fopen(serverInfoFile, "w+");
+  server_info_file = string(serverInfoDir) + "/server_" + string(serverName) + ".txt";
+  fp = fopen(server_info_file.c_str(), "w+");
   fprintf(fp, "ip: %s\n", serverIp);
   fprintf(fp, "port: %0d\n", serverPort);
   fflush(fp);
   fclose(fp);
-  printf("Server: [%s] has started, info in %s\n", serverName, serverInfoFile);
+  printf("Server: [%s] has started, info in %s\n", serverName, server_info_file.c_str());
 }
 
 int Server::acceptNewSocket() {

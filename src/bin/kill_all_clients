@@ -1,0 +1,14 @@
+#!/bin/bash
+
+# This script kills all client lists in the multisim directory,
+# it consider all clients to be running on the current machine
+
+set -e
+
+multisim_dir="$1"
+[ -z "$multisim_dir" ] && { echo "Usage: $0 <multisim_directory>"; exit 1; }
+
+for client_file in "$multisim_dir"/client_*.txt; do
+  pid="$(grep "^pid: " $client_file | awk '{print $2}')"
+  kill "$pid"
+done
