@@ -15,7 +15,6 @@ module multisim_client_push #(
 
   initial begin
     data_rdy = 0;
-    wait (server_name != "");
     multisim_client_start(SERVER_RUNTIME_DIRECTORY, server_name);
     data_rdy = 1;
   end

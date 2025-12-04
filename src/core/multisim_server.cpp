@@ -3,7 +3,6 @@
 
 #include <cassert>
 #include <map>
-#include <stdlib.h>
 #include <string>
 #include <unistd.h>
 
@@ -29,7 +28,7 @@ int multisim_server_get_data(char const *server_name, data_handle_t data_handle,
   int buf_32b_size = (data_width + 31) / 32;
   uint32_t read_buf[buf_32b_size];
   int idx = server_name_to_idx[server_name];
-#ifdef EMULATION
+#if defined(EMULATION) || defined(SW)
   uint32_t *data = data_handle;
 #else
   svBitVecVal *data = (svBitVecVal *)svGetArrayPtr(data_handle);
@@ -65,7 +64,7 @@ int multisim_server_send_data(char const *server_name, const data_handle_t data_
   int buf_32b_size = (data_width + 31) / 32;
   uint32_t send_buf[buf_32b_size];
   int idx = server_name_to_idx[server_name];
-#ifdef EMULATION
+#if defined(EMULATION) || defined(SW)
   uint32_t *data = data_handle;
 #else
   svBitVecVal *data = (svBitVecVal *)svGetArrayPtr(data_handle);

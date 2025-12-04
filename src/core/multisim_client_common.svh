@@ -10,13 +10,21 @@ import "DPI-C" function void multisim_client_start(
 
 import "DPI-C" function int multisim_client_get_data(
   string server_name,
+`ifdef EMULATION
+  output bit [31:0] data[Data32bWidth],
+`else
   output bit [31:0] data[],
+`endif
   input int data_width
 );
 
 import "DPI-C" function int multisim_client_send_data(
   string server_name,
+`ifdef EMULATION
+  input bit [31:0] data[Data32bWidth],
+`else
   input bit [31:0] data[],
+`endif
   input int data_width
 );
 
@@ -49,6 +57,7 @@ endfunction
 //-----------------------------------------------------------
 // end of simulation
 //-----------------------------------------------------------
+`ifndef EMULATION
 initial begin
   multisim_client_end_of_simulation eos;
   eos = new();
@@ -76,3 +85,4 @@ initial begin
     end
   end
 end
+`endif

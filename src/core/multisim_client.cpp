@@ -1,7 +1,6 @@
 #include "multisim_client.h"
 #include "socket_server/client.h"
 
-#include "stdlib.h"
 #include <cassert>
 #include <map>
 #include <stdio.h>

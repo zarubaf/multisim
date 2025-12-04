@@ -15,7 +15,6 @@ module multisim_client_pull #(
 
   initial begin
     data_vld = 0;
-    wait (server_name != "");
     multisim_client_start(SERVER_RUNTIME_DIRECTORY, server_name);
   end
 
