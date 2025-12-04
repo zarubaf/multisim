@@ -6,12 +6,20 @@ localparam int Data32bWidth = (DATA_WIDTH + 31) / 32;
 import "DPI-C" function void multisim_server_start(string name);
 import "DPI-C" function int multisim_server_get_data(
   input string name,
+`ifdef EMULATION
+  output bit [31:0] data[Data32bWidth],
+`else
   output bit [31:0] data[],
+`endif
   input int data_width
 );
 import "DPI-C" function int multisim_server_send_data(
   input string name,
+`ifdef EMULATION
+  input bit [31:0] data[Data32bWidth],
+`else
   input bit [31:0] data[],
+`endif
   input int data_width
 );
 
@@ -44,6 +52,8 @@ endfunction
 //-----------------------------------------------------------
 // end of simulation
 //-----------------------------------------------------------
+// TODO: can it work in emulation?
+`ifndef EMULATION
 final begin
   string server_exit_file = "multisim/server_exit";
   int fp;
@@ -54,3 +64,4 @@ final begin
   $fwrite(fp, "");
   $fclose(fp);
 end
+`endif
