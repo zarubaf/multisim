@@ -11,6 +11,8 @@ module multisim_client_push #(
     input bit [DATA_WIDTH-1:0] data
 );
 
+  localparam PULL_DATA_WIDTH = DATA_WIDTH;
+  localparam PUSH_DATA_WIDTH = DATA_WIDTH;
   `include "multisim_client_common.svh"
 
   initial begin

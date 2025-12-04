@@ -8,7 +8,10 @@ module multisim_server_push #(
     input bit [DATA_WIDTH-1:0] data
 );
 
+  localparam PULL_DATA_WIDTH = DATA_WIDTH;
+  localparam PUSH_DATA_WIDTH = DATA_WIDTH;
   `include "multisim_server_common.svh"
+
 
   bit server_has_started = 0;
   initial begin
