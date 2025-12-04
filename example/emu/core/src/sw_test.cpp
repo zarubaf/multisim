@@ -5,7 +5,6 @@
 #include <stdio.h>
 #include <sys/time.h>
 
-
 #define BW_ITERATION_NB 100000
 
 void print_bw_value(struct timeval start, struct timeval stop, uint32_t byte_nb) {
@@ -13,7 +12,7 @@ void print_bw_value(struct timeval start, struct timeval stop, uint32_t byte_nb)
   secs = (double)(stop.tv_usec - start.tv_usec) / 1000000 + (double)(stop.tv_sec - start.tv_sec);
   printf("time: %.3f s\n", secs);
   printf("byte_nb: %d\n", byte_nb);
-  printf("BW = %0d B/sec\n", (uint32_t)(byte_nb/secs));
+  printf("BW = %0d B/sec\n", (uint32_t)(byte_nb / secs));
 }
 
 int main() {
@@ -51,7 +50,7 @@ int main() {
     assert(r > 0);
   }
   gettimeofday(&stop, NULL);
-  print_bw_value(start, stop, BW_ITERATION_NB*8);
+  print_bw_value(start, stop, BW_ITERATION_NB * 8);
 
   printf("\nbandwidth test: pull only\n");
   gettimeofday(&start, NULL);
@@ -60,7 +59,7 @@ int main() {
     assert(r > 0);
   }
   gettimeofday(&stop, NULL);
-  print_bw_value(start, stop, BW_ITERATION_NB*8);
+  print_bw_value(start, stop, BW_ITERATION_NB * 8);
 
   printf("\nbandwidth test: push/pull\n");
   gettimeofday(&start, NULL);
@@ -71,7 +70,7 @@ int main() {
     assert(r > 0);
   }
   gettimeofday(&stop, NULL);
-  print_bw_value(start, stop, BW_ITERATION_NB*8);
+  print_bw_value(start, stop, BW_ITERATION_NB * 8);
 
   //-----------------------------------------------------------
   // exit
