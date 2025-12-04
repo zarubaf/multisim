@@ -33,10 +33,10 @@ int main() {
   //-----------------------------------------------------------
   printf("\nloopback test\n");
   printf("rx64: 0xcafedeca 0xdeadbeef\n");
-  r = multisim_client_send_data("rx64", write_buf, 64);
+  r = multisim_client_push("rx64", write_buf, 64);
   assert(r > 0);
 
-  r = multisim_client_get_data("tx64", read_buf, 64);
+  r = multisim_client_pull("tx64", read_buf, 64);
   printf("tx64: 0x%08x 0x%08x\n", read_buf[0], read_buf[1]);
   assert(r > 0);
 
@@ -46,7 +46,7 @@ int main() {
   printf("\nbandwidth test: push only\n");
   gettimeofday(&start, NULL);
   for (int i = 0; i < BW_ITERATION_NB; i++) {
-    r = multisim_client_send_data("rx64", write_buf, 64);
+    r = multisim_client_push("rx64", write_buf, 64);
     assert(r > 0);
   }
   gettimeofday(&stop, NULL);
@@ -55,7 +55,7 @@ int main() {
   printf("\nbandwidth test: pull only\n");
   gettimeofday(&start, NULL);
   for (int i = 0; i < BW_ITERATION_NB; i++) {
-    r = multisim_client_get_data("tx64", read_buf, 64);
+    r = multisim_client_pull("tx64", read_buf, 64);
     assert(r > 0);
   }
   gettimeofday(&stop, NULL);
@@ -64,9 +64,9 @@ int main() {
   printf("\nbandwidth test: push/pull\n");
   gettimeofday(&start, NULL);
   for (int i = 0; i < BW_ITERATION_NB; i++) {
-    r = multisim_client_send_data("rx64", write_buf, 64);
+    r = multisim_client_push("rx64", write_buf, 64);
     assert(r > 0);
-    r = multisim_client_get_data("tx64", read_buf, 64);
+    r = multisim_client_pull("tx64", read_buf, 64);
     assert(r > 0);
   }
   gettimeofday(&stop, NULL);
@@ -77,7 +77,7 @@ int main() {
   //-----------------------------------------------------------
   printf("exit\n");
   // sending whatever to exit socket will quit the Veloce
-  r = multisim_client_send_data("exit", write_buf, 32);
+  r = multisim_client_push("exit", write_buf, 32);
   assert(r > 0);
 
   return 0;

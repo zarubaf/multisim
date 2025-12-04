@@ -29,7 +29,7 @@ module multisim_server_pull #(
         data_vld <= 0;
         @(posedge clk);
       end
-      data_vld_dpi = multisim_server_get_data_packed(server_name, data_dpi, DATA_WIDTH);
+      data_vld_dpi = multisim_server_pull_packed(server_name, data_dpi, DATA_WIDTH);
       data_vld <= data_vld_dpi[0];
       data <= data_dpi;
       dpi_delay <= data_vld_dpi[0] ? DPI_DELAY_CYCLES_ACTIVE : DPI_DELAY_CYCLES_INACTIVE;

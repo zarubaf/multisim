@@ -8,7 +8,7 @@ import "DPI-C" function void multisim_client_start(
   input string server_name
 );
 
-import "DPI-C" function int multisim_client_get_data(
+import "DPI-C" function int multisim_client_pull(
   string server_name,
 `ifdef EMULATION
   output bit [31:0] data[Data32bWidth],
@@ -18,7 +18,7 @@ import "DPI-C" function int multisim_client_get_data(
   input int data_width
 );
 
-import "DPI-C" function int multisim_client_send_data(
+import "DPI-C" function int multisim_client_push(
   string server_name,
 `ifdef EMULATION
   input bit [31:0] data[Data32bWidth],
@@ -28,12 +28,12 @@ import "DPI-C" function int multisim_client_send_data(
   input int data_width
 );
 
-function automatic int multisim_client_get_data_packed(
+function automatic int multisim_client_pull_packed(
     string server_name, output bit [DATA_WIDTH-1:0] data, input int data_width);
   bit [31:0] data_unpacked[Data32bWidth];
   bit [Data32bWidth*32-1:0] data_tmp;
   int ret;
-  ret = multisim_client_get_data(server_name, data_unpacked, data_width);
+  ret = multisim_client_pull(server_name, data_unpacked, data_width);
   for (int i = 0; i < Data32bWidth; i++) begin
     data_tmp[i*32+:32] = data_unpacked[i];
   end
@@ -41,7 +41,7 @@ function automatic int multisim_client_get_data_packed(
   return ret;
 endfunction
 
-function automatic int multisim_client_send_data_packed(
+function automatic int multisim_client_push_packed(
     string server_name, input bit [DATA_WIDTH-1:0] data, input int data_width);
   bit [31:0] data_unpacked[Data32bWidth];
   bit [Data32bWidth*32-1:0] data_tmp;
@@ -50,7 +50,7 @@ function automatic int multisim_client_send_data_packed(
   for (int i = 0; i < Data32bWidth; i++) begin
     data_unpacked[i] = data_tmp[i*32+:32];
   end
-  ret = multisim_client_send_data(server_name, data_unpacked, data_width);
+  ret = multisim_client_push(server_name, data_unpacked, data_width);
   return ret;
 endfunction
 

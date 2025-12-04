@@ -24,13 +24,13 @@ module multisim_client_push #(
   always @(posedge clk) begin
     if (data_vld && data_rdy) begin
       int data_rdy_dpi;
-      data_rdy_dpi = multisim_client_send_data_packed(server_name, data, DATA_WIDTH);
+      data_rdy_dpi = multisim_client_push_packed(server_name, data, DATA_WIDTH);
       data_rdy <= data_rdy_dpi[0];
       data_q   <= data;
     end
     if (!data_rdy) begin
       int data_rdy_dpi;
-      data_rdy_dpi = multisim_client_send_data_packed(server_name, data_q, DATA_WIDTH);
+      data_rdy_dpi = multisim_client_push_packed(server_name, data_q, DATA_WIDTH);
       data_rdy <= data_rdy_dpi[0];
     end
   end

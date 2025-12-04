@@ -24,9 +24,9 @@ typedef svOpenArrayHandle data_handle_t;
 extern "C" int multisim_server_start(char const *server_name);
 
 // get data from client
-extern "C" int multisim_server_get_data(char const *server_name, data_handle_t data_handle,
-                                        int data_width);
+extern "C" int multisim_server_pull(char const *server_name, data_handle_t data_handle,
+                                    int data_width);
 
 // send data to client
-extern "C" int multisim_server_send_data(char const *server_name, const data_handle_t data_handle,
-                                         int data_width);
+extern "C" int multisim_server_push(char const *server_name, const data_handle_t data_handle,
+                                    int data_width);

@@ -54,8 +54,7 @@ void multisim_client_start(char const *server_runtime_directory, char const *ser
 }
 
 // #define SIMULATE_SEND_FAIL_CLIENT
-int multisim_client_send_data(char const *server_name, const data_handle_t data_handle,
-                              int data_width) {
+int multisim_client_push(char const *server_name, const data_handle_t data_handle, int data_width) {
   int r;
   int buf_32b_size = (data_width + 31) / 32;
   uint32_t send_buf[buf_32b_size];
@@ -74,7 +73,7 @@ int multisim_client_send_data(char const *server_name, const data_handle_t data_
   static int cnt = 0;
   cnt++;
   if (cnt % 1000 == 0) {
-    printf("multisim_client_send_data: simulate send fail\n");
+    printf("multisim_client_push: simulate send fail\n");
     return 0;
   }
 #endif
@@ -86,7 +85,7 @@ int multisim_client_send_data(char const *server_name, const data_handle_t data_
   return 1;
 }
 
-int multisim_client_get_data(char const *server_name, data_handle_t data_handle, int data_width) {
+int multisim_client_pull(char const *server_name, data_handle_t data_handle, int data_width) {
   int r;
   int buf_32b_size = (data_width + 31) / 32;
   uint32_t read_buf[buf_32b_size];
