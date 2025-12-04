@@ -13,7 +13,8 @@ module top;
   bit exit;
 
   multisim_server_pull #(
-      .DATA_WIDTH(1)
+      .DATA_WIDTH(1),
+      .DPI_DELAY_CYCLES_INACTIVE(10000)
   ) i_multisim_server_pull_exit (
       .clk        (clk),
       .server_name("exit"),

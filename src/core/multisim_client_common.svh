@@ -7,11 +7,13 @@ import "DPI-C" function void multisim_client_start(
   input string server_runtime_directory,
   input string server_name
 );
+
 import "DPI-C" function int multisim_client_get_data(
   string server_name,
   output bit [31:0] data[],
   input int data_width
 );
+
 import "DPI-C" function int multisim_client_send_data(
   string server_name,
   input bit [31:0] data[],
