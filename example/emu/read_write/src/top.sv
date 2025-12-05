@@ -39,7 +39,7 @@ module top;
   bit rw_cmd_vld;
   bit [3*64-1:0] rw_cmd;
 
-  wire [63:0] rw_cmd_rwb = rw_cmd[0*64+:64];
+  wire rw_cmd_rwb = rw_cmd[0];
   wire [63:0] rw_cmd_address = rw_cmd[1*64+:64];
   wire [63:0] rw_cmd_wdata = rw_cmd[2*64+:64];
 
@@ -48,7 +48,7 @@ module top;
   bit [63:0] rw_rsp;
 
   multisim_server_pull_then_push #(
-      .PULL_DATA_WIDTH(3*64),
+      .PULL_DATA_WIDTH(3 * 64),
       .PUSH_DATA_WIDTH(64)
   ) i_multisim_server_rw (
       .clk             (clk),
@@ -74,9 +74,9 @@ module top;
 
     // process
     if (rw_cmd_rwb) begin
-      rw_rsp <= mem[rw_cmd_address];
+      rw_rsp <= mem[rw_cmd_address[7:0]];
     end else begin
-      mem[rw_cmd_address] <= rw_cmd_wdata;
+      mem[rw_cmd_address[7:0]] <= rw_cmd_wdata;
       rw_rsp <= 0;
     end
 
