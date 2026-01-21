@@ -3,6 +3,10 @@
 cpu_nb="$1"
 [ "$cpu_nb" = "" ] && cpu_nb=4
 
+# on exit, send SIGTERM to all the processes in the foreground process group,
+# this allows for a clean termination of the clients
+trap 'kill -SIGTERM -$$' EXIT
+
 # change ulimit to avoid libc crash
 ulimit_factor=$(((cpu_nb + 15) / 16))
 ulimit -s $((ulimit_factor * 8192)) # stack size in kB
