@@ -1,4 +1,5 @@
 #include "multisim_client.h"
+#include "multisim_common.h"
 #include "socket_server/client.h"
 
 #include <cassert>
@@ -15,7 +16,7 @@ map<string, int> server_name_to_idx;
 
 void multisim_client_start(char const *server_runtime_directory, char const *server_name) {
   Client *client;
-  string server_info_dir = string(server_runtime_directory) + "/multisim";
+  string server_info_dir = string(server_runtime_directory) + "/.multisim";
 
   assert(server_idx < MULTISIM_SERVER_MAX);
 
@@ -24,7 +25,7 @@ void multisim_client_start(char const *server_runtime_directory, char const *ser
   sockets[server_idx] = client->getSocket();
   server_name_to_idx[server_name] = server_idx;
 
-#if defined(SW)
+#if defined(MULTISIM_SW)
   // make socket blocking
   int flags;
   flags = fcntl(sockets[server_idx], F_GETFD, 0);
@@ -59,7 +60,7 @@ int multisim_client_push(char const *server_name, const data_handle_t data_handl
   int buf_32b_size = (data_width + 31) / 32;
   uint32_t send_buf[buf_32b_size];
   int idx = server_name_to_idx[server_name];
-#if defined(EMULATION) || defined(SW)
+#if defined(MULTISIM_EMULATION) || defined(MULTISIM_SW)
   uint32_t *data = data_handle;
 #else
   svBitVecVal *data = (svBitVecVal *)svGetArrayPtr(data_handle);
@@ -74,15 +75,15 @@ int multisim_client_push(char const *server_name, const data_handle_t data_handl
   cnt++;
   if (cnt % 1000 == 0) {
     printf("multisim_client_push: simulate send fail\n");
-    return 0;
+    return MULTISIM_FAIL;
   }
 #endif
 
   r = send(sockets[idx], send_buf, sizeof(send_buf), 0);
   if (r <= 0) { // send failed
-    return 0;
+    return MULTISIM_FAIL;
   }
-  return 1;
+  return MULTISIM_SUCCESS;
 }
 
 int multisim_client_pull(char const *server_name, data_handle_t data_handle, int data_width) {
@@ -90,7 +91,7 @@ int multisim_client_pull(char const *server_name, data_handle_t data_handle, int
   int buf_32b_size = (data_width + 31) / 32;
   uint32_t read_buf[buf_32b_size];
   int idx = server_name_to_idx[server_name];
-#if defined(EMULATION) || defined(SW)
+#if defined(MULTISIM_EMULATION) || defined(MULTISIM_SW)
   uint32_t *data = data_handle;
 #else
   svBitVecVal *data = (svBitVecVal *)svGetArrayPtr(data_handle);
@@ -98,11 +99,11 @@ int multisim_client_pull(char const *server_name, data_handle_t data_handle, int
 
   r = read(sockets[idx], read_buf, sizeof(read_buf));
   if (r <= 0) {
-    return 0;
+    return MULTISIM_FAIL;
   }
 
   for (int i = 0; i < buf_32b_size; i++) {
     data[i] = read_buf[i];
   }
-  return 1;
+  return MULTISIM_SUCCESS;
 }
