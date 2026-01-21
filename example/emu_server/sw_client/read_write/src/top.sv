@@ -20,7 +20,7 @@ module top;
   ) i_multisim_server_pull_exit (
       .clk        (clk),
       .server_name("exit"),
-      .data_rdy   (1),
+      .data_rdy   (1'b1),
       .data_vld   (exit),
       .data       (  /*unused*/)
   );
