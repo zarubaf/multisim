@@ -12,31 +12,13 @@ EOF
 }
 
 
-compile_veloce() {
-  local lib_dir=veloce_rundir
-  local rtl_sv_lib=vel_sv_work
-
-  cp -rf $emulation_dir/input/compilation/* .
-
-  banner "veloce: lib"
-  mkdir $lib_dir
-  vellib $lib_dir/$rtl_sv_lib
-
-  banner "veloce: analyze sv"
-  velanalyze -sv -mfcu -work $rtl_sv_lib $MULTISIM_SRC/core/multisim_server_*.sv +define+MULTISIM_EMULATION
-  velanalyze -sv -mfcu -work $rtl_sv_lib $emulation_dir/src/*.sv
-
-  banner "veloce: compilation"
-  velcomp
-}
-
 rm -rf output_sim
 mkdir -p output_sim
 cd output_sim
 
 banner "C: compile client"
 g++ -o run_sw_test                            \
-  -DMULTISIM_SW                                        \
+  -DMULTISIM_SW                               \
   -I${MULTISIM_SRC}/core                      \
   $MULTISIM_SRC/core/multisim_client.cpp      \
   $MULTISIM_SRC/core/socket_server/client.cpp \
