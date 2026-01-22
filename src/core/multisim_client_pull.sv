@@ -17,6 +17,10 @@ module multisim_client_pull #(
 
   initial begin
     data_vld = 0;
+`ifndef MULTISIM_EMULATION
+    /* verilator lint_off WAITCONST */
+    wait (server_name != "");
+`endif
     multisim_client_start(SERVER_RUNTIME_DIRECTORY, server_name);
   end
 

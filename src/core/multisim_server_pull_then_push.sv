@@ -32,6 +32,11 @@ module multisim_server_pull_then_push #(
 
   bit server_has_started = 0;
   initial begin
+`ifndef MULTISIM_EMULATION
+    /* verilator lint_off WAITCONST */
+    wait (pull_server_name != "");
+    wait (push_server_name != "");
+`endif
     multisim_server_start(pull_server_name);
     multisim_server_start(push_server_name);
     server_has_started = 1;
