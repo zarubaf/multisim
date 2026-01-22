@@ -1,4 +1,6 @@
 // Description: Simple fake CPU sending and receiving IRQs
+//
+// Self checking: fails if o_irq does not loopback in i_irq
 
 module cpu #(
     parameter int TRANSACTION_NB = 1000,
@@ -28,6 +30,8 @@ module cpu #(
     end
   endtask
 
+  bit [31:0] expected_irq_queue[$];
+
   int received_irq_nb = 0;
   bit [31:0] i_irq_prev = 0;
 
@@ -41,6 +45,10 @@ module cpu #(
     i_irq_prev <= i_irq;
     if (received_irq_nb < TRANSACTION_NB) begin
       if (i_irq != i_irq_prev) begin
+        bit [31:0] expected_irq = expected_irq_queue.pop_front();
+        if (expected_irq != i_irq) begin
+          $fatal(1, "expected 0x%x, got 0x%x", expected_irq, i_irq);
+        end
         $display("[cpu_%0d] CPU i_irq = 0x%08x (%0d/%0d)", cpu_index, i_irq, received_irq_nb,
                  TRANSACTION_NB);
         received_irq_nb++;
@@ -59,6 +67,7 @@ module cpu #(
       wait_n_cycles(int'(wait_cycles));  // 0 to 7 cycles extra delay
       o_irq <= o_irq_next;
 
+      expected_irq_queue.push_back(o_irq_next);
       $display("[cpu_%0d] CPU o_irq = 0x%08x", cpu_index, o_irq_next);
     end
   end

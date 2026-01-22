@@ -1,3 +1,7 @@
+// Description: Simple fake CPU sending DATA to the NOC.
+//
+// Self checking: fails if data_noc_to_cpu does not loopback in data_cpu_to_noc
+
 module cpu #(
     parameter int TRANSACTION_NB = 1000,
     parameter int COMPUTATION_COMPLEXITY = 20
@@ -34,6 +38,9 @@ module cpu #(
     end
   endtask
 
+
+  bit [63:0] expected_data_queue[$];
+
   //-----------------------------------------------------------
   // cpu -> noc
   //-----------------------------------------------------------
@@ -54,9 +61,10 @@ module cpu #(
       transaction_cpu_to_noc_done <= 1;
     end else begin
       x <= xorshift64star(x, COMPUTATION_COMPLEXITY * 1000000);
-      wait_n_cycles(int'(x[3:0])); // 0 to 7 cycles extra delay
+      wait_n_cycles(int'(x[3:0]));  // 0 to 7 cycles extra delay
       data_cpu_to_noc_vld <= 1;
       data_cpu_to_noc <= x;
+      expected_data_queue.push_back(x);
       $display("[cpu_%0d] CPU sent 0x%016x (transaction_cpu_to_noc %0d/%0d)", cpu_index, x,
                transaction_cpu_to_noc_idx, TRANSACTION_NB);
       transaction_cpu_to_noc_idx <= transaction_cpu_to_noc_idx + 1;
@@ -74,9 +82,13 @@ module cpu #(
 
   always_ff @(posedge clk) begin
     if (data_noc_to_cpu_vld && data_noc_to_cpu_rdy) begin
-      if (transaction_noc_to_cpu_idx == (TRANSACTION_NB-1)) begin
+      if (transaction_noc_to_cpu_idx == (TRANSACTION_NB - 1)) begin
         transaction_noc_to_cpu_done <= 1;
       end else begin
+        bit [63:0] expected_data = expected_data_queue.pop_front();
+        if (expected_data != data_noc_to_cpu) begin
+          $fatal(1, "expected 0x%x, got 0x%x", expected_data, data_noc_to_cpu);
+        end
         $display("[cpu_%0d] CPU received 0x%016x (transaction_noc_to_cpu %0d/%0d)", cpu_index,
                  data_noc_to_cpu, transaction_noc_to_cpu_idx, TRANSACTION_NB);
         transaction_noc_to_cpu_idx <= transaction_noc_to_cpu_idx + 1;

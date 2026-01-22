@@ -1,5 +1,7 @@
 // Description: Simple fake CPU sending APB read and write transactions
 // This code has a lot of simplifications and assumptions for illustrative purposes.
+//
+// Self checking: check read data against reference array
 
 module cpu
   import apb_pkg::*;
@@ -35,8 +37,12 @@ module cpu
     end
   endtask
 
+  bit [APB_DATA_WIDTH-1:0] memory_array[1024];  // 1024 entries per CPU
+
   task static apb_read(input bit [APB_ADDR_WIDTH-1:0] address,
                        output bit [APB_DATA_WIDTH-1:0] rdata);
+    bit [APB_DATA_WIDTH-1:0] expected_rdata;
+
     // request
     o_apb_m_req.addr <= address;
     o_apb_m_req.wdata <= 0;
@@ -53,6 +59,12 @@ module cpu
     rdata = i_apb_m_resp.rdata;
     o_apb_m_psel <= 0;
     o_apb_m_penable <= 0;
+
+    // check against reference array
+    expected_rdata = memory_array[address];
+    if (expected_rdata != rdata) begin
+      $fatal(1, "expected 0x%x, got 0x%x", expected_rdata, rdata);
+    end
   endtask
 
   task static apb_write(input bit [APB_ADDR_WIDTH-1:0] address,
@@ -72,6 +84,9 @@ module cpu
     while (!i_apb_m_pready) @(posedge clk);
     o_apb_m_psel <= 0;
     o_apb_m_penable <= 0;
+
+    // update reference array
+    memory_array[address] = wdata;
   endtask
 
   int read_transaction_nb = 0;

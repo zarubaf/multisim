@@ -1,5 +1,7 @@
 // Description: Simple fake CPU sending AXI read and write transactions
 // This code has a lot of simplifications and assumptions for illustrative purposes.
+//
+// Self checking: check read data against reference array
 
 module cpu
   import axi_pkg::*;
@@ -49,8 +51,12 @@ module cpu
     end
   endtask
 
+  bit [AXI_DATA_WIDTH-1:0] memory_array[1024];  // 1024 entries per CPU
+
   task static axi_read(input bit [AXI_ADDR_WIDTH-1:0] address,
                        output bit [AXI_DATA_WIDTH-1:0] rdata);
+    bit [AXI_DATA_WIDTH-1:0] expected_rdata;
+
     // AR
     o_axi_m_ar.id    <= cpu_index[AXI_ID_WIDTH-1:0];
     o_axi_m_ar.addr  <= address;
@@ -74,6 +80,12 @@ module cpu
     while (!i_axi_m_rvalid) @(posedge clk);
     rdata = i_axi_m_r.data;
     o_axi_m_rready <= 0;
+
+    // check against reference array
+    expected_rdata = memory_array[address];
+    if (expected_rdata != rdata) begin
+      $fatal(1, "expected 0x%x, got 0x%x", expected_rdata, rdata);
+    end
   endtask
 
   task static axi_write(input bit [AXI_ADDR_WIDTH-1:0] address,
@@ -114,6 +126,9 @@ module cpu
     @(posedge clk);
     while (!i_axi_m_bvalid) @(posedge clk);
     o_axi_m_bready <= 0;
+
+    // update reference array
+    memory_array[address] = wdata;
   endtask
 
   int read_transaction_nb = 0;

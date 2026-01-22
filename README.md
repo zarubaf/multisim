@@ -102,5 +102,4 @@ Cons:
 
 # 🚀 future
 * X/Z support
-* self checking examples
 * simple transaction logging to help debug
