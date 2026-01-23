@@ -1,0 +1,70 @@
+#!/usr/bin/env bash
+
+set -e
+
+#--------------------------------------------------------------
+# functions
+#--------------------------------------------------------------
+banner() {
+cat << EOF
+
+#--------------------------------------------------------------
+# $@
+#--------------------------------------------------------------
+EOF
+}
+
+run_sim() {
+  banner "sim: run server"
+  g++ -o libdpi.so -g -shared -fPIC             \
+    -I${QUESTASIM_HOME}/include                 \
+    $MULTISIM_SRC/core/multisim_server.cpp      \
+    $MULTISIM_SRC/core/socket_server/server.cpp
+  qrun -64                                                \
+    ../src/top.sv                                         \
+    +incdir+$MULTISIM_SRC/core                            \
+    $MULTISIM_SRC/core/multisim_server_push.sv            \
+    $MULTISIM_SRC/core/multisim_server_pull.sv            \
+    $MULTISIM_SRC/core/multisim_server_pull_then_push.sv  \
+    -sv_lib libdpi
+}
+
+#--------------------------------------------------------------
+# execution
+#--------------------------------------------------------------
+rm -rf output
+mkdir -p output
+cd output
+
+# on exit, send SIGTERM to all the processes in the foreground process group,
+# this allows for a clean termination of the clients
+exit_clean=0
+send_sigterm_to_process_group() {
+  if ((exit_clean != 1)); then
+    echo "Send SIGTERM to process group"
+    kill -SIGTERM -$$
+  fi
+}
+trap send_sigterm_to_process_group EXIT
+
+
+# 1- clean server files
+rm -rf .multisim
+
+# 2- start server
+run_sim &
+
+# 3- start client (decide pass/fail)
+banner "C: compile client"
+g++ -o run_sw_test                            \
+  -DMULTISIM_SW                               \
+  -I${MULTISIM_SRC}/core                      \
+  $MULTISIM_SRC/core/multisim_client.cpp      \
+  $MULTISIM_SRC/core/socket_server/client.cpp \
+  ../src/sw_test.cpp
+
+./run_sw_test
+
+ # leave time to sim to exit
+ sleep 5
+ exit_clean=1
