@@ -1,0 +1,58 @@
+#!/usr/bin/env bash
+
+set -e
+
+RUNTIME_DIR="$(readlink -e $(dirname $0))"
+
+
+#--------------------------------------------------------------
+# functions
+#--------------------------------------------------------------
+run_emu() {
+  export LD_LIBRARY_PATH="$PWD:$LD_LIBRARY_PATH"
+  cmd="velrun -c -emul $Emulator -sv_lib libdpi -do run.tcl"
+
+  echo $cmd
+  $cmd
+}
+
+run_sim() {
+  verilator --binary -j 0                       \
+    ../src/sim/sim.sv                           \
+    +incdir+$MULTISIM_SRC/core                  \
+    $MULTISIM_SRC/core/multisim_client_push.sv  \
+    $MULTISIM_SRC/core/multisim_client_pull.sv  \
+    $MULTISIM_SRC/core/multisim_client.cpp      \
+    $MULTISIM_SRC/core/socket_server/client.cpp
+  time ./obj_dir/Vsim
+}
+
+
+#--------------------------------------------------------------
+# execution
+#--------------------------------------------------------------
+cd $RUNTIME_DIR
+
+# on exit, send SIGTERM to all the processes in the foreground process group,
+# this allows for a clean termination of the clients
+exit_clean=0
+send_sigterm_to_process_group() {
+  if ((exit_clean != 1)); then
+    echo "Send SIGTERM to process group"
+    kill -SIGTERM -$$
+  fi
+}
+trap send_sigterm_to_process_group EXIT
+
+# 1- clean server files
+rm -rf .multisim
+
+# 2- start server
+run_emu &
+
+# 3- start client (decide pass/fail)
+run_sim
+
+ # leave time to velrun to exit
+sleep 15
+exit_clean=1
