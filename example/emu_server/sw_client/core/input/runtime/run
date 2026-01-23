@@ -8,14 +8,12 @@ RUNTIME_DIR="$(readlink -e $(dirname $0))"
 #--------------------------------------------------------------
 # functions
 #--------------------------------------------------------------
-usage() {
-  cat << EOF
-usage: $(basename $0) [ARGS]
+run_emu() {
+  export LD_LIBRARY_PATH="$PWD:$LD_LIBRARY_PATH"
+  cmd="velrun -c -emul $Emulator -sv_lib libdpi -do run.tcl"
 
-where ARGS are:
-  -h                : display this help
-  -g|--gui          : use GUI
-EOF
+  echo $cmd
+  $cmd
 }
 
 
@@ -24,27 +22,26 @@ EOF
 #--------------------------------------------------------------
 cd $RUNTIME_DIR
 
-cli_gui_options="-c"
-while [ "$#" -gt 0 ]
-do
-  case "$1" in
-    -h)
-      usage
-      exit 0
-      ;;
-    -g|--gui)
-      shift 1
-      cli_gui_options="-gui"
-      ;;
-    *)
-      usage
-      exit 1
-      ;;
-  esac
-done
+# on exit, send SIGTERM to all the processes in the foreground process group,
+# this allows for a clean termination of the clients
+exit_clean=0
+send_sigterm_to_process_group() {
+  if ((exit_clean != 1)); then
+    echo "Send SIGTERM to process group"
+    kill -SIGTERM -$$
+  fi
+}
+trap send_sigterm_to_process_group EXIT
 
-export LD_LIBRARY_PATH="$PWD:$LD_LIBRARY_PATH"
-cmd="velrun $cli_gui_options -emul $Emulator -sv_lib libdpi -do run.tcl"
+# 1- clean server files
+rm -rf .multisim
 
-echo $cmd
-$cmd
+# 2- start server
+run_emu &
+
+# 3- start client (decide pass/fail)
+./run_sw_test
+
+ # leave time to velrun to exit
+sleep 15
+exit_clean=1

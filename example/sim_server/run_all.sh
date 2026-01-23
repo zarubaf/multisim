@@ -7,12 +7,12 @@ SCRIPT_DIR=$(readlink -f $0)
 run_test () (
   test_script="$1"
   cd $(dirname $test_script)
-  ./$(basename $test_script) &> /dev/null
+  ./$(basename $test_script) &> run.log
 )
 
 global_fail=0
 
-for test_script in $(find -type f -name run); do
+for test_script in $(find -L -type f -name run); do
   [[ $test_script =~ "/normal/" ]] && continue
   fail=0
   echo -n "Testing $test_script..."
