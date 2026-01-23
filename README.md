@@ -3,16 +3,12 @@
 <img alt="Multisim" height="280" src="./.assets/multisim_light.png" />
 
 simulate your RTL with real multi-threaded speed  
-interface different simulators and chiplets together
+interface different simulators, chiplets and platforms together
 </div>
 
 # 💡 rationale
 
-RTL simulations:
-* are typically single threaded and don't scale well when your DUT size increases
-* run in 1 simulation environment, which makes it hard to simulate multiple chips together
-
-`multisim` is a systemverilog/DPI library allowing multiple simulations to run in parallel and communicate to simulate your DUT.
+`multisim` is a systemverilog/DPI library allowing multiple simulations/platforms to run in parallel and communicate to simulate your DUT.
 
 Typically, you can have:
 * 1 **server simulation** with your DUT skeleton (NOC, fabric, etc)
@@ -46,21 +42,25 @@ Reusing [this example](./example/sim_server/sim_client/core/multi/src) where we 
   * [apb](./src/apb/)
   * [quasi static signals](./src/quasi_static/) (useful for signals without control signals like IRQ)
 
-## testbench
-### example
-See the following files from the [example](./example/sim_server/sim_client/core/multi/src):
-* [server testbench](./example/sim_server/sim_client/core/normal/src/top.sv)
-* [server replacement of CPU module](./example/sim_server/sim_client/core/multi/src/cpu_multisim_server.sv)
-* [client simulation of CPU module](./example/sim_server/sim_client/core/multi/src/cpu_multisim_client.sv)
+## examples
+All examples can be found [here](./example):
 
-### channels
+Tested platform combinations:
+
+| client \ server | sim | emu | sw |
+| - | - | - | - |
+| sim | ✅ [examples](./example/sim_server/sim_client/) | ❓ untested | ❓ untested |
+| emu | ❓ untested | ❓ untested | ❓ untested |
+| sw | ✅ [examples](./example/sim_server/sw_client/) | ✅ [examples](./example/emu_server/sw_client/) | ❓ untested |
+
+## channels
 * **server simulation** and **client simulations** communicate through channels
 * channels direction can be `client->server` or `server->client`
-* each **simulation** can use mulitple channels
+* each **simulation** can use multiple channels
 * `multisim` modules need a unique `server_name` to link a client/server channel together
 * client modules need to set `SERVER_RUNTIME_DIRECTORY` to know the port/ip address of each channel
 
-### end of simulation
+## end of simulation
 * **server simulation** can stop the simulation normally (`$finish`, etc)
 * **client simulations** must not stop the simulation themselves
   * they will automatically be stopped when the **server simulation** is done
@@ -81,20 +81,11 @@ make RELEASE_DIR=... TARGET=SIMULATION|EMULATION|SW
 
 The .so libs their headers are located in `RELEASE_DIR`.
 
-
-## runtime
-See the [example](./example/sim_server/sim_client/core/multi/run_cpu):
-* **simulation** (server+clients) [run script](./example/sim_server/sim_client/core/multi/run)
-* **server simulation** [run script](./example/sim_server/sim_client/core/multi/run_top)
-* **client simulation** [run script](./example/sim_server/sim_client/core/multi/run_cpu)
-
 # ⚖ pros and cons
 Pros:
 * speed: split your big DUT in as many smaller parts as you want
-* interoperability: each server/client can use different simulators (Verilator, VCS, Questa, Xcelium, etc)
+* interoperability: can use different simulators/platforms combinations (Verilator, VCS, Questa, Xcelium, Veloce, Palladium, Zebu, Qemu etc)
 * scalability: as long as you have enough CPUs on your server
-* cost: server CPUs are cheaper than emulation solution usually
-* bringup time: super easy modules, simple interface (e.g.: AXI is 5 channels)
 
 Cons:
 * ⚠ **no cycle accuracy** ⚠: functionally accurate, but not cycle accurate
