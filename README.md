@@ -51,7 +51,7 @@ Tested platform combinations:
 | - | - | - | - |
 | sim | ✅ [examples](./example/sim_server/sim_client/) | ✅ [examples](./example/emu_server/sim_client/) | ❓ untested |
 | emu | ❓ untested | ❓ untested | ❓ untested |
-| sw | ✅ [examples](./example/sim_server/sw_client/) | ✅ [examples](./example/emu_server/sw_client/) | ❓ untested |
+| sw | ✅ [examples](./example/sim_server/sw_client/) | ✅ [examples](./example/emu_server/sw_client/) |  ✅ [examples](./example/sw_server/sw_client/) |
 
 ## channels
 * **server simulation** and **client simulations** communicate through channels
