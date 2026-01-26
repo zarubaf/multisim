@@ -1,3 +1,12 @@
+`define BW_ITERATION_NB 100000
+
+import "DPI-C" function real get_current_time_in_sec();
+import "DPI-C" function void print_bandwidth(
+  real t0,
+  real t1,
+  int  bytes
+);
+
 module sim;
 
   reg clk;
@@ -127,6 +136,9 @@ module sim;
   // use "always" instead of "initial" here because of this Verilator quirk:
   // https://github.com/verilator/verilator/issues/5210
   always begin
+    real t0;
+    real t1;
+
     // avoid initial race condition
     @(posedge clk);
 
@@ -154,6 +166,27 @@ module sim;
       read_rtl(address, rdata);
       $display("0x%x <- [%0d]", rdata, address);
     end
+
+
+    //-----------------------------------------------------------
+    // bandwidth tests
+    //-----------------------------------------------------------
+    $display("\nbandwidth test: write");
+    t0 = get_current_time_in_sec();
+    for (bit [63:0] i = 0; i < `BW_ITERATION_NB; i++) begin
+      write_rtl(0, 64'hdeadbeefcafedeca);
+    end
+    t1 = get_current_time_in_sec();
+    print_bandwidth(t0, t1, `BW_ITERATION_NB * 8);
+
+    $display("\nbandwidth test: read");
+    t0 = get_current_time_in_sec();
+    for (bit [63:0] i = 0; i < `BW_ITERATION_NB; i++) begin
+      bit [63:0] rdata;
+      read_rtl(0, rdata);
+    end
+    t1 = get_current_time_in_sec();
+    print_bandwidth(t0, t1, `BW_ITERATION_NB * 8);
 
     //-----------------------------------------------------------
     // exit

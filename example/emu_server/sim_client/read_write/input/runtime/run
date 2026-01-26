@@ -19,6 +19,7 @@ run_emu() {
 run_sim() {
   verilator --binary -j 0                       \
     ../src/sim/sim.sv                           \
+    ../src/sim/bandwith.cpp                     \
     +incdir+$MULTISIM_SRC/core                  \
     $MULTISIM_SRC/core/multisim_client_push.sv  \
     $MULTISIM_SRC/core/multisim_client_pull.sv  \
