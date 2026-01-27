@@ -38,6 +38,10 @@ module multisim_server_axi_push #(
   string server_name_axi_ar;
   string server_name_axi_r;
   initial begin
+`ifndef MULTISIM_EMULATION
+    /* verilator lint_off WAITCONST */
+    wait (server_name != "");
+`endif
     $sformat(server_name_axi_aw, "%0s_axi_aw", server_name);
     $sformat(server_name_axi_w, "%0s_axi_w", server_name);
     $sformat(server_name_axi_b, "%0s_axi_b", server_name);

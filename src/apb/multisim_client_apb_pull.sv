@@ -21,6 +21,10 @@ module multisim_client_apb_pull #(
   string server_name_apb_req;
   string server_name_apb_resp;
   initial begin
+`ifndef MULTISIM_EMULATION
+    /* verilator lint_off WAITCONST */
+    wait (server_name != "");
+`endif
     $sformat(server_name_apb_req, "%0s_apb_req", server_name);
     $sformat(server_name_apb_resp, "%0s_apb_resp", server_name);
   end
