@@ -36,6 +36,9 @@ module cpu
 );
 
   function automatic bit [63:0] xorshift64star(input bit [63:0] x, input bit [31:0] iterations = 1);
+    if (x == 64'h0) begin
+      x = 64'hdeadbeefdeadbeef + longint'(cpu_index);
+    end
     repeat (iterations) begin
       x = x ^ (x >> 12);
       x = x ^ (x << 25);
@@ -51,7 +54,7 @@ module cpu
     end
   endtask
 
-  bit [AXI_DATA_WIDTH-1:0] memory_array[1024];  // 1024 entries per CPU
+  logic [AXI_DATA_WIDTH-1:0] memory_array[1024];  // 1024 entries per CPU
 
   task static axi_read(input bit [AXI_ADDR_WIDTH-1:0] address,
                        output bit [AXI_DATA_WIDTH-1:0] rdata);
@@ -82,9 +85,9 @@ module cpu
     o_axi_m_rready <= 0;
 
     // check against reference array
-    expected_rdata = memory_array[address];
-    if (expected_rdata != rdata) begin
-      $fatal(1, "expected 0x%x, got 0x%x", expected_rdata, rdata);
+    expected_rdata = memory_array[address[9:0]];
+    if (expected_rdata !== rdata) begin
+      $fatal(1, "at [0x%x]: expected 0x%x, got 0x%x", address, expected_rdata, rdata);
     end
   endtask
 
@@ -128,16 +131,12 @@ module cpu
     o_axi_m_bready <= 0;
 
     // update reference array
-    memory_array[address] = wdata;
+    memory_array[address[9:0]] = wdata;
   endtask
 
   int read_transaction_nb = 0;
 
   bit [63:0] x;
-  initial begin
-    #1;
-    x = 64'hdeadbeefdeadbeef + longint'(cpu_index);
-  end
 
   always_ff @(posedge clk) begin
     o_axi_m_awvalid <= 0;
@@ -147,10 +146,10 @@ module cpu
     o_axi_m_rready  <= 0;
 
     if (read_transaction_nb < TRANSACTION_NB) begin
-      bit rwb = x[4];
-      bit [3:0] cmd_wait_cycles = x[3:0];
-      bit [3:0] aw_w_wait_cycles = x[8:5];
-      int address = int'({cpu_index, x[9+:7], 3'b0});
+      automatic bit rwb = x[4];
+      automatic bit [3:0] cmd_wait_cycles = x[3:0];
+      automatic bit [3:0] aw_w_wait_cycles = x[8:5];
+      automatic int address = int'({cpu_index, x[9+:7], 3'b0});
 
       x <= xorshift64star(x, COMPUTATION_COMPLEXITY * 1000000);
       wait_n_cycles(int'(cmd_wait_cycles));  // 0 to 7 cycles extra delay

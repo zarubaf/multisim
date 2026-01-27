@@ -2,13 +2,15 @@
 
 module multisim_client_push #(
     parameter string SERVER_RUNTIME_DIRECTORY = "../output_top",
-    parameter int DATA_WIDTH = 64
+    parameter int DATA_WIDTH = 64,
+    // do not touch
+    parameter type multisim_data_t = `ifdef MULTISIM_SIMULATION_4_STATE logic `else bit `endif
 ) (
     input bit clk,
     input string server_name,
     output bit data_rdy,
     input bit data_vld,
-    input bit [DATA_WIDTH-1:0] data
+    input multisim_data_t [DATA_WIDTH-1:0] data
 );
 
   localparam PULL_DATA_WIDTH = DATA_WIDTH;
@@ -25,7 +27,7 @@ module multisim_client_push #(
     data_rdy = 1;
   end
 
-  bit [DATA_WIDTH-1:0] data_q;
+  multisim_data_t [DATA_WIDTH-1:0] data_q;
 
   always @(posedge clk) begin
     if (data_vld && data_rdy) begin

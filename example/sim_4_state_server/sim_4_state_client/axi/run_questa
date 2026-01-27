@@ -1,0 +1,19 @@
+#!/bin/bash
+
+cpu_nb="$1"
+[ "$cpu_nb" = "" ] && cpu_nb=4
+
+# on exit, send SIGTERM to all the processes in the foreground process group,
+# this allows for a clean termination of the clients
+trap 'kill -SIGTERM -$$' EXIT
+
+# 1- clean server files
+rm -rf output_top/.multisim
+
+# 2- start clients
+for ((i=0;i<cpu_nb;i++)); do
+  ./run_cpu $i &
+done
+
+# 3- start server
+./run_top $cpu_nb

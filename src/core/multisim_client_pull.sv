@@ -2,13 +2,15 @@
 
 module multisim_client_pull #(
     parameter string SERVER_RUNTIME_DIRECTORY = "../output_top",
-    parameter int DATA_WIDTH = 64
+    parameter int DATA_WIDTH = 64,
+    // do not touch
+    parameter type multisim_data_t = `ifdef MULTISIM_SIMULATION_4_STATE logic `else bit `endif
 ) (
     input bit clk,
     input string server_name,
     input bit data_rdy,
     output bit data_vld,
-    output bit [DATA_WIDTH-1:0] data
+    output multisim_data_t [DATA_WIDTH-1:0] data
 );
 
   localparam PULL_DATA_WIDTH = DATA_WIDTH;
@@ -25,7 +27,7 @@ module multisim_client_pull #(
   end
 
   always @(posedge clk) begin
-    bit [DATA_WIDTH-1:0] data_dpi;
+    multisim_data_t [DATA_WIDTH-1:0] data_dpi;
     if (!data_vld || data_rdy) begin
       int data_vld_dpi;
       data_vld_dpi = multisim_client_pull_packed(server_name, data_dpi, DATA_WIDTH);

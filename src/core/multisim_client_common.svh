@@ -14,7 +14,7 @@ import "DPI-C" function int multisim_client_pull(
 `ifdef MULTISIM_EMULATION
   output bit [31:0] data[PullData32bWidth],
 `else
-  output bit [31:0] data[],
+  output multisim_data_t [31:0] data[],
 `endif
   input int data_width
 );
@@ -24,15 +24,15 @@ import "DPI-C" function int multisim_client_push(
 `ifdef MULTISIM_EMULATION
   input bit [31:0] data[PushData32bWidth],
 `else
-  input bit [31:0] data[],
+  input multisim_data_t [31:0] data[],
 `endif
   input int data_width
 );
 
 function automatic int multisim_client_pull_packed(
-    string server_name, output bit [PULL_DATA_WIDTH-1:0] data, input int data_width);
-  bit [31:0] data_unpacked[PullData32bWidth];
-  bit [PullData32bWidth*32-1:0] data_tmp;
+    string server_name, output multisim_data_t [PULL_DATA_WIDTH-1:0] data, input int data_width);
+  multisim_data_t [31:0] data_unpacked[PullData32bWidth];
+  multisim_data_t [PullData32bWidth*32-1:0] data_tmp;
   int ret;
   ret = multisim_client_pull(server_name, data_unpacked, data_width);
   for (int i = 0; i < PullData32bWidth; i++) begin
@@ -43,9 +43,9 @@ function automatic int multisim_client_pull_packed(
 endfunction
 
 function automatic int multisim_client_push_packed(
-    string server_name, input bit [PUSH_DATA_WIDTH-1:0] data, input int data_width);
-  bit [31:0] data_unpacked[PushData32bWidth];
-  bit [PushData32bWidth*32-1:0] data_tmp;
+    string server_name, input multisim_data_t [PUSH_DATA_WIDTH-1:0] data, input int data_width);
+  multisim_data_t [31:0] data_unpacked[PushData32bWidth];
+  multisim_data_t [PushData32bWidth*32-1:0] data_tmp;
   int ret;
   data_tmp[PUSH_DATA_WIDTH-1:0] = data;
   for (int i = 0; i < PushData32bWidth; i++) begin

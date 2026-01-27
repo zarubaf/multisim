@@ -13,19 +13,21 @@ module multisim_server_pull_then_push #(
     // in emulation, calling DPI at every cycle impacts performance,
     // adding delays in between calls improves that a lot
     parameter int DPI_DELAY_CYCLES_INACTIVE = 1000,
-    parameter int DPI_DELAY_CYCLES_ACTIVE = 10
+    parameter int DPI_DELAY_CYCLES_ACTIVE = 10,
+    // do not touch
+    parameter type multisim_data_t = `ifdef MULTISIM_SIMULATION_4_STATE logic `else bit `endif
 ) (
     input bit clk,
     // pull
     input string pull_server_name,
     input bit pull_data_rdy,
     output bit pull_data_vld,
-    output bit [PULL_DATA_WIDTH-1:0] pull_data,
+    output multisim_data_t [PULL_DATA_WIDTH-1:0] pull_data,
     // push
     input string push_server_name,
     output bit push_data_rdy,
     input bit push_data_vld,
-    input bit [PUSH_DATA_WIDTH-1:0] push_data
+    input multisim_data_t [PUSH_DATA_WIDTH-1:0] push_data
 );
 
   `include "multisim_server_common.svh"
@@ -57,7 +59,7 @@ module multisim_server_pull_then_push #(
 
   int dpi_delay;
   always @(posedge clk) begin
-    bit [PULL_DATA_WIDTH-1:0] pull_data_dpi;
+    multisim_data_t [PULL_DATA_WIDTH-1:0] pull_data_dpi;
     if (server_has_started && (!pull_data_vld || pull_data_rdy)) begin
       // pull
       int pull_data_vld_dpi;

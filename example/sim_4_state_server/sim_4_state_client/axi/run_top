@@ -1,0 +1,26 @@
+#!/bin/bash
+
+set -e
+
+cpu_nb="$1"
+[ "$cpu_nb" = "" ] && cpu_nb=4
+
+mkdir -p output_top
+cp -rfL src/* output_top
+cd output_top
+
+g++ -o libdpi.so -g -shared -fPIC             \
+  -I${QUESTASIM_HOME}/include                 \
+  $MULTISIM_SRC/core/multisim_server.cpp      \
+  $MULTISIM_SRC/core/socket_server/server.cpp
+
+qrun -64                                        \
+  +define+MULTISIM                              \
+  top.sv memory.sv cpu_multisim_server.sv       \
+  +incdir+$MULTISIM_SRC/core                    \
+  $MULTISIM_SRC/core/multisim_server_push.sv    \
+  $MULTISIM_SRC/core/multisim_server_pull.sv    \
+  $MULTISIM_SRC/axi/multisim_server_axi_pull.sv \
+  -GCPU_NB=$cpu_nb                              \
+  -top top                                      \
+  -sv_lib libdpi

@@ -1,0 +1,26 @@
+#!/bin/bash
+
+set -e
+
+cpu_index="$1"
+
+output_dir=output_cpu_$cpu_index
+
+mkdir -p $output_dir
+cp -rfL src/* $output_dir
+cd $output_dir
+
+g++ -o libdpi.so -g -shared -fPIC             \
+  -I${QUESTASIM_HOME}/include                 \
+  $MULTISIM_SRC/core/multisim_client.cpp      \
+  $MULTISIM_SRC/core/socket_server/client.cpp
+
+qrun -64 \
+  cpu_multisim_client.sv cpu.sv                 \
+  +incdir+$MULTISIM_SRC/core                    \
+  $MULTISIM_SRC/core/multisim_client_push.sv    \
+  $MULTISIM_SRC/core/multisim_client_pull.sv    \
+  $MULTISIM_SRC/axi/multisim_client_axi_push.sv \
+  -sv_lib libdpi                                \
+  +CPU_INDEX=$cpu_index                         \
+  > sim.log
