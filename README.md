@@ -47,11 +47,12 @@ All examples can be found [here](./example):
 
 Tested platform combinations:
 
-| client \ server | sim | emu | sw |
-| - | - | - | - |
-| sim | ✅ [examples](./example/sim_server/sim_client/) | ✅ [examples](./example/emu_server/sim_client/) | ❓ untested |
-| emu | ❓ untested | ❓ untested | ❓ untested |
-| sw | ✅ [examples](./example/sim_server/sw_client/) | ✅ [examples](./example/emu_server/sw_client/) |  ✅ [examples](./example/sw_server/sw_client/) |
+| client \ server | sim                                             | emu                                             | sw                                            | sim (4-state)                                                   |
+| -               | -                                               | -                                               | -                                             | -                                                               |
+| sim             | ✅ [examples](./example/sim_server/sim_client/) | ✅ [examples](./example/emu_server/sim_client/) | untested                                      | unsupported                                                     |
+| emu             | untested                                        | untested                                        | untested                                      | unsupported                                                     |
+| sw              | ✅ [examples](./example/sim_server/sw_client/)  | ✅ [examples](./example/emu_server/sw_client/)  | ✅ [examples](./example/sw_server/sw_client/) | unsupported                                                     |
+| sim (4-state)   | unsupported                                     | unsupported                                     | unsupported                                   | ✅ [examples](./example/sim_4_state_server/sim_4_state_client/) |
 
 ## channels
 * **server simulation** and **client simulations** communicate through channels

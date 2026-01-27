@@ -58,16 +58,27 @@ void multisim_client_start(char const *server_runtime_directory, char const *ser
 int multisim_client_push(char const *server_name, const data_handle_t data_handle, int data_width) {
   int r;
   int buf_32b_size = (data_width + 31) / 32;
+#if defined(MULTISIM_SIMULATION_4_STATE)
+  uint32_t send_buf[2*buf_32b_size];
+#else
   uint32_t send_buf[buf_32b_size];
+#endif
   int idx = server_name_to_idx[server_name];
 #if defined(MULTISIM_EMULATION) || defined(MULTISIM_SW)
   uint32_t *data = data_handle;
+#elif defined(MULTISIM_SIMULATION_4_STATE)
+  svLogicVecVal *data = (svLogicVecVal *)svGetArrayPtr(data_handle);
 #else
   svBitVecVal *data = (svBitVecVal *)svGetArrayPtr(data_handle);
 #endif
 
   for (int i = 0; i < buf_32b_size; i++) {
+#if defined(MULTISIM_SIMULATION_4_STATE)
+    send_buf[i] = data[i].aval;
+    send_buf[buf_32b_size + i] = data[i].bval;
+#else
     send_buf[i] = data[i];
+#endif
   }
 
 #ifdef SIMULATE_SEND_FAIL_CLIENT
@@ -89,10 +100,16 @@ int multisim_client_push(char const *server_name, const data_handle_t data_handl
 int multisim_client_pull(char const *server_name, data_handle_t data_handle, int data_width) {
   int r;
   int buf_32b_size = (data_width + 31) / 32;
+#if defined(MULTISIM_SIMULATION_4_STATE)
+  uint32_t read_buf[2*buf_32b_size];
+#else
   uint32_t read_buf[buf_32b_size];
+#endif
   int idx = server_name_to_idx[server_name];
 #if defined(MULTISIM_EMULATION) || defined(MULTISIM_SW)
   uint32_t *data = data_handle;
+#elif defined(MULTISIM_SIMULATION_4_STATE)
+  svLogicVecVal *data = (svLogicVecVal *)svGetArrayPtr(data_handle);
 #else
   svBitVecVal *data = (svBitVecVal *)svGetArrayPtr(data_handle);
 #endif
@@ -103,7 +120,12 @@ int multisim_client_pull(char const *server_name, data_handle_t data_handle, int
   }
 
   for (int i = 0; i < buf_32b_size; i++) {
+#if defined(MULTISIM_SIMULATION_4_STATE)
+    data[i].aval = read_buf[i];
+    data[i].bval = read_buf[buf_32b_size + i];
+#else
     data[i] = read_buf[i];
+#endif
   }
   return MULTISIM_SUCCESS;
 }

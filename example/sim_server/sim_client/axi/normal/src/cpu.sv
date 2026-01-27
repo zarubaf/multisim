@@ -57,8 +57,8 @@ module cpu
   logic [AXI_DATA_WIDTH-1:0] memory_array[1024];  // 1024 entries per CPU
 
   task static axi_read(input bit [AXI_ADDR_WIDTH-1:0] address,
-                       output bit [AXI_DATA_WIDTH-1:0] rdata);
-    bit [AXI_DATA_WIDTH-1:0] expected_rdata;
+                       output logic [AXI_DATA_WIDTH-1:0] rdata);
+    logic [AXI_DATA_WIDTH-1:0] expected_rdata;
 
     // AR
     o_axi_m_ar.id    <= cpu_index[AXI_ID_WIDTH-1:0];
