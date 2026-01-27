@@ -51,20 +51,3 @@ function automatic int multisim_server_push_packed(
   ret = multisim_server_push(server_name, data_unpacked, data_width);
   return ret;
 endfunction
-
-//-----------------------------------------------------------
-// end of simulation
-//-----------------------------------------------------------
-// TODO: can it work in emulation?
-`ifndef MULTISIM_EMULATION
-final begin
-  static string server_exit_file = ".multisim/server_exit";
-  int fp;
-  fp = $fopen(server_exit_file, "w");
-  if (fp == 0) begin
-    $fatal("cannot write server_exit_file");
-  end
-  $fwrite(fp, "");
-  $fclose(fp);
-end
-`endif

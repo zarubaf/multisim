@@ -1,5 +1,3 @@
-`include "multisim_client_common_header.svh"
-
 module multisim_client_pull #(
     parameter string SERVER_RUNTIME_DIRECTORY = "../output_top",
     parameter int DATA_WIDTH = 64,

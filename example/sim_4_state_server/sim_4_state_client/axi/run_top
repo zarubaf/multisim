@@ -24,3 +24,5 @@ qrun -64                                        \
   -GCPU_NB=$cpu_nb                              \
   -top top                                      \
   -sv_lib libdpi
+
+$MULTISIM_SRC/bin/kill_all_clients

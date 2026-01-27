@@ -61,9 +61,12 @@ Tested platform combinations:
 * client modules need to set `SERVER_RUNTIME_DIRECTORY` to know the port/ip address of each channel
 
 ## end of simulation
-* **server simulation** can stop the simulation normally (`$finish`, etc)
-* **client simulations** must not stop the simulation themselves
-  * they will automatically be stopped when the **server simulation** is done
+You can either:
+* use the helper function `$MULTISIM_SRC/bin/kill_all_clients` to kill clients running in the backgroud
+* use an "exit" channel to send exit instructions to the clients/servers you want to kill
+* write a custom kill script
+
+Find more info about PIDs/IPs of your clients in the server runtime directory in `.multisim/client*.txt`
 
 ## compilation
 1. source [env.sh](./env.sh)

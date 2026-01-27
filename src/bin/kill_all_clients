@@ -6,9 +6,10 @@
 set -e
 
 multisim_dir="$1"
-[ -z "$multisim_dir" ] && { echo "Usage: $0 <multisim_directory>"; exit 1; }
+[ -z "$multisim_dir" ] && multisim_dir=".multisim"
 
 for client_file in "$multisim_dir"/client_*.txt; do
   pid="$(grep "^pid: " $client_file | awk '{print $2}')"
+  [ "$pid" = "" ] && continue
   kill "$pid"
 done

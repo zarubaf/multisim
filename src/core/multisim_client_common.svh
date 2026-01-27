@@ -54,36 +54,3 @@ function automatic int multisim_client_push_packed(
   ret = multisim_client_push(server_name, data_unpacked, data_width);
   return ret;
 endfunction
-
-//-----------------------------------------------------------
-// end of simulation
-//-----------------------------------------------------------
-`ifndef MULTISIM_EMULATION
-initial begin
-  multisim_client_end_of_simulation eos;
-  eos = new();
-
-  // make sure only 1 process handles eos to improve performance
-  @(posedge clk);
-  if (eos.handles_end_of_simulation()) begin
-    int check_every_n_cycles;
-    if (!$value$plusargs("MULTISIM_EOS_CHECK_EVERY_N_CYCLES=%d", check_every_n_cycles)) begin
-      check_every_n_cycles = 1000;
-    end
-
-    forever begin
-      int fp;
-      repeat (check_every_n_cycles) begin
-        @(posedge clk);
-      end
-      // can be checked ~2M times/sec on Verilator
-      fp = $fopen({SERVER_RUNTIME_DIRECTORY, "/.multisim/server_exit"}, "r");
-      if (fp != 0) begin
-        $fclose(fp);
-        $display("multisim_client: end of simulation");
-        $finish;
-      end
-    end
-  end
-end
-`endif

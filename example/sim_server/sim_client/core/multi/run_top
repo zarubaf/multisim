@@ -25,3 +25,5 @@ cat << EOF
 ----------------------------------------
 EOF
 time ./obj_dir/Vtop
+
+$MULTISIM_SRC/bin/kill_all_clients
