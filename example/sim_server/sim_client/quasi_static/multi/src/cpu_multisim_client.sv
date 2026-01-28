@@ -4,7 +4,7 @@ module cpu_multisim_client ();
 
   bit    [31:0] irq_rx;
   bit    [31:0] irq_tx;
-  bit     finish;
+  bit           finish;
 
   bit    [31:0] cpu_index;
   string        server_name_cpu_to_loopback;
@@ -29,30 +29,30 @@ module cpu_multisim_client ();
   );
 
   multisim_client_quasi_static_push #(
-      .SERVER_RUNTIME_DIRECTORY("../output_top"),
       .DATA_WIDTH(32)
   ) i_multisim_client_quasi_static_push (
-      .clk        (clk),
-      .server_name(server_name_cpu_to_loopback),
-      .data       (irq_tx)
+      .clk                     (clk),
+      .server_runtime_directory("../output_top"),
+      .server_name             (server_name_cpu_to_loopback),
+      .data                    (irq_tx)
   );
 
   multisim_client_quasi_static_pull #(
-      .SERVER_RUNTIME_DIRECTORY("../output_top"),
       .DATA_WIDTH(32)
   ) i_multisim_client_quasi_static_pull (
-      .clk        (clk),
-      .server_name(server_name_loopback_to_cpu),
-      .data       (irq_rx)
+      .clk                     (clk),
+      .server_runtime_directory("../output_top"),
+      .server_name             (server_name_loopback_to_cpu),
+      .data                    (irq_rx)
   );
 
   multisim_client_quasi_static_push #(
-      .SERVER_RUNTIME_DIRECTORY("../output_top"),
       .DATA_WIDTH(1)
   ) i_multisim_client_quasi_static_push_finish (
-      .clk        (clk),
-      .server_name(server_name_finish),
-      .data       (finish)
+      .clk                     (clk),
+      .server_runtime_directory("../output_top"),
+      .server_name             (server_name_finish),
+      .data                    (finish)
   );
 
   //initial begin

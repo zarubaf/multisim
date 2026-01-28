@@ -33,18 +33,18 @@ module cpu_multisim_client ();
   );
 
   multisim_client_apb_push #(
-      .SERVER_RUNTIME_DIRECTORY("../output_top"),
-      .apb_req_t(apb_req_t),
+      .apb_req_t (apb_req_t),
       .apb_resp_t(apb_resp_t)
   ) i_multisim_client_apb_push (
-      .clk            (clk),
-      .rst_n          (1),
-      .server_name    (server_name),
-      .i_apb_s_req    (apb_req),
-      .o_apb_s_resp   (apb_resp),
-      .i_apb_s_psel   (apb_psel),
-      .i_apb_s_penable(apb_penable),
-      .o_apb_s_pready (apb_pready)
+      .clk                     (clk),
+      .rst_n                   (1),
+      .server_runtime_directory("../output_top"),
+      .server_name             (server_name),
+      .i_apb_s_req             (apb_req),
+      .o_apb_s_resp            (apb_resp),
+      .i_apb_s_psel            (apb_psel),
+      .i_apb_s_penable         (apb_penable),
+      .o_apb_s_pready          (apb_pready)
   );
 
   //initial begin

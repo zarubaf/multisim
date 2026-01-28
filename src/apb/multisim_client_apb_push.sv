@@ -1,12 +1,12 @@
 `include "multisim_apb_fsm.sv"
 
 module multisim_client_apb_push #(
-    parameter string SERVER_RUNTIME_DIRECTORY = "../output_top",
-    parameter type   apb_req_t,
-    parameter type   apb_resp_t
+    parameter type apb_req_t,
+    parameter type apb_resp_t
 ) (
     input bit clk,
     input bit rst_n,
+    input string server_runtime_directory,
     input string server_name,
 
     // subordinate APB interface
@@ -23,6 +23,7 @@ module multisim_client_apb_push #(
   initial begin
 `ifndef MULTISIM_EMULATION
     /* verilator lint_off WAITCONST */
+    wait (server_runtime_directory != "");
     wait (server_name != "");
 `endif
     $sformat(server_name_apb_req, "%0s_apb_req", server_name);
@@ -43,7 +44,7 @@ module multisim_client_apb_push #(
   );
 
   wire request_rdy;
-  bit request_vld;
+  bit  request_vld;
   wire response_rdy = 1;
   wire response_vld;
   assign o_apb_s_pready = response_vld;
@@ -61,26 +62,26 @@ module multisim_client_apb_push #(
 
   // request
   multisim_client_push #(
-      .SERVER_RUNTIME_DIRECTORY(SERVER_RUNTIME_DIRECTORY),
       .DATA_WIDTH($bits(apb_req_t))
   ) i_multisim_client_push_apb_req (
-      .clk        (clk_gated),
-      .server_name(server_name_apb_req),
-      .data_rdy   (request_rdy),
-      .data_vld   (request_vld),
-      .data       (i_apb_s_req)
+      .clk                     (clk_gated),
+      .server_runtime_directory(server_runtime_directory),
+      .server_name             (server_name_apb_req),
+      .data_rdy                (request_rdy),
+      .data_vld                (request_vld),
+      .data                    (i_apb_s_req)
   );
 
   // response
   multisim_client_pull #(
-      .SERVER_RUNTIME_DIRECTORY(SERVER_RUNTIME_DIRECTORY),
       .DATA_WIDTH($bits(apb_resp_t))
   ) i_multisim_client_pull_apb_resp (
-      .clk        (clk_gated),
-      .server_name(server_name_apb_resp),
-      .data_rdy   (response_rdy),
-      .data_vld   (response_vld),
-      .data       (o_apb_s_resp)
+      .clk                     (clk_gated),
+      .server_runtime_directory(server_runtime_directory),
+      .server_name             (server_name_apb_resp),
+      .data_rdy                (response_rdy),
+      .data_vld                (response_vld),
+      .data                    (o_apb_s_resp)
   );
 
 endmodule

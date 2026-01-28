@@ -59,7 +59,7 @@ Tested platform combinations:
 * channels direction can be `client->server` or `server->client`
 * each **simulation** can use multiple channels
 * `multisim` modules need a unique `server_name` to link a client/server channel together
-* client modules need to set `SERVER_RUNTIME_DIRECTORY` to know the port/ip address of each channel
+* client modules need to set `server_runtime_directory` to know the port/ip address of each channel
 
 ## end of simulation
 You can either:

@@ -1,10 +1,10 @@
 module multisim_client_pull #(
-    parameter string SERVER_RUNTIME_DIRECTORY = "../output_top",
     parameter int DATA_WIDTH = 64,
     // do not touch
     parameter type multisim_data_t = `ifdef MULTISIM_SIMULATION_4_STATE logic `else bit `endif
 ) (
     input bit clk,
+    input string server_runtime_directory,
     input string server_name,
     input bit data_rdy,
     output bit data_vld,
@@ -19,9 +19,10 @@ module multisim_client_pull #(
     data_vld = 0;
 `ifndef MULTISIM_EMULATION
     /* verilator lint_off WAITCONST */
+    wait (server_runtime_directory != "");
     wait (server_name != "");
 `endif
-    multisim_client_start(SERVER_RUNTIME_DIRECTORY, server_name);
+    multisim_client_start(server_runtime_directory, server_name);
   end
 
   always @(posedge clk) begin

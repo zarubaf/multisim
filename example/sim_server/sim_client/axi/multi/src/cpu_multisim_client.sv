@@ -53,31 +53,31 @@ module cpu_multisim_client ();
   );
 
   multisim_client_axi_push #(
-      .SERVER_RUNTIME_DIRECTORY("../output_top"),
       .axi_aw_t(axi_aw_t),
-      .axi_w_t(axi_w_t),
-      .axi_b_t(axi_b_t),
+      .axi_w_t (axi_w_t),
+      .axi_b_t (axi_b_t),
       .axi_ar_t(axi_ar_t),
-      .axi_r_t(axi_r_t)
+      .axi_r_t (axi_r_t)
   ) i_multisim_client_axi_push (
-      .clk            (clk),
-      .rst_n          (1),
-      .server_name    (server_name),
-      .i_axi_s_aw     (axi_aw),
-      .o_axi_s_awready(axi_awready),
-      .i_axi_s_awvalid(axi_awvalid),
-      .i_axi_s_w      (axi_w),
-      .o_axi_s_wready (axi_wready),
-      .i_axi_s_wvalid (axi_wvalid),
-      .o_axi_s_b      (axi_b),
-      .i_axi_s_bready (axi_bready),
-      .o_axi_s_bvalid (axi_bvalid),
-      .i_axi_s_ar     (axi_ar),
-      .o_axi_s_arready(axi_arready),
-      .i_axi_s_arvalid(axi_arvalid),
-      .o_axi_s_r      (axi_r),
-      .i_axi_s_rready (axi_rready),
-      .o_axi_s_rvalid (axi_rvalid)
+      .clk                     (clk),
+      .rst_n                   (1),
+      .server_runtime_directory("../output_top"),
+      .server_name             (server_name),
+      .i_axi_s_aw              (axi_aw),
+      .o_axi_s_awready         (axi_awready),
+      .i_axi_s_awvalid         (axi_awvalid),
+      .i_axi_s_w               (axi_w),
+      .o_axi_s_wready          (axi_wready),
+      .i_axi_s_wvalid          (axi_wvalid),
+      .o_axi_s_b               (axi_b),
+      .i_axi_s_bready          (axi_bready),
+      .o_axi_s_bvalid          (axi_bvalid),
+      .i_axi_s_ar              (axi_ar),
+      .o_axi_s_arready         (axi_arready),
+      .i_axi_s_arvalid         (axi_arvalid),
+      .o_axi_s_r               (axi_r),
+      .i_axi_s_rready          (axi_rready),
+      .o_axi_s_rvalid          (axi_rvalid)
   );
 
   //initial begin

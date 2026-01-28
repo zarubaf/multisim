@@ -1,13 +1,13 @@
 module multisim_client_axi_push #(
-    parameter string SERVER_RUNTIME_DIRECTORY = "../output_top",
-    parameter type   axi_aw_t,
-    parameter type   axi_w_t,
-    parameter type   axi_b_t,
-    parameter type   axi_ar_t,
-    parameter type   axi_r_t
+    parameter type axi_aw_t,
+    parameter type axi_w_t,
+    parameter type axi_b_t,
+    parameter type axi_ar_t,
+    parameter type axi_r_t
 ) (
     input bit clk,
     input bit rst_n,
+    input string server_runtime_directory,
     input string server_name,
 
     // subordinate AXI interface
@@ -41,6 +41,7 @@ module multisim_client_axi_push #(
   initial begin
 `ifndef MULTISIM_EMULATION
     /* verilator lint_off WAITCONST */
+    wait (server_runtime_directory != "");
     wait (server_name != "");
 `endif
     $sformat(server_name_axi_aw, "%0s_axi_aw", server_name);
@@ -55,62 +56,62 @@ module multisim_client_axi_push #(
 
   // AW
   multisim_client_push #(
-      .SERVER_RUNTIME_DIRECTORY(SERVER_RUNTIME_DIRECTORY),
       .DATA_WIDTH($bits(axi_aw_t))
   ) i_multisim_client_push_axi_aw (
-      .clk        (clk_gated),
-      .server_name(server_name_axi_aw),
-      .data_rdy   (o_axi_s_awready),
-      .data_vld   (i_axi_s_awvalid),
-      .data       (i_axi_s_aw)
+      .clk                     (clk_gated),
+      .server_runtime_directory(server_runtime_directory),
+      .server_name             (server_name_axi_aw),
+      .data_rdy                (o_axi_s_awready),
+      .data_vld                (i_axi_s_awvalid),
+      .data                    (i_axi_s_aw)
   );
 
   // W
   multisim_client_push #(
-      .SERVER_RUNTIME_DIRECTORY(SERVER_RUNTIME_DIRECTORY),
       .DATA_WIDTH($bits(axi_w_t))
   ) i_multisim_client_push_axi_w (
-      .clk        (clk_gated),
-      .server_name(server_name_axi_w),
-      .data_rdy   (o_axi_s_wready),
-      .data_vld   (i_axi_s_wvalid),
-      .data       (i_axi_s_w)
+      .clk                     (clk_gated),
+      .server_runtime_directory(server_runtime_directory),
+      .server_name             (server_name_axi_w),
+      .data_rdy                (o_axi_s_wready),
+      .data_vld                (i_axi_s_wvalid),
+      .data                    (i_axi_s_w)
   );
 
   // B
   multisim_client_pull #(
-      .SERVER_RUNTIME_DIRECTORY(SERVER_RUNTIME_DIRECTORY),
       .DATA_WIDTH($bits(axi_b_t))
   ) i_multisim_client_pull_axi_b (
-      .clk        (clk_gated),
-      .server_name(server_name_axi_b),
-      .data_rdy   (i_axi_s_bready),
-      .data_vld   (o_axi_s_bvalid),
-      .data       (o_axi_s_b)
+      .clk                     (clk_gated),
+      .server_runtime_directory(server_runtime_directory),
+      .server_name             (server_name_axi_b),
+      .data_rdy                (i_axi_s_bready),
+      .data_vld                (o_axi_s_bvalid),
+      .data                    (o_axi_s_b)
   );
 
   // AR
   multisim_client_push #(
-      .SERVER_RUNTIME_DIRECTORY(SERVER_RUNTIME_DIRECTORY),
       .DATA_WIDTH($bits(axi_ar_t))
   ) i_multisim_client_push_axi_ar (
-      .clk        (clk_gated),
-      .server_name(server_name_axi_ar),
-      .data_rdy   (o_axi_s_arready),
-      .data_vld   (i_axi_s_arvalid),
-      .data       (i_axi_s_ar)
+      .clk                     (clk_gated),
+      .server_runtime_directory(server_runtime_directory),
+      .server_name             (server_name_axi_ar),
+      .data_rdy                (o_axi_s_arready),
+      .data_vld                (i_axi_s_arvalid),
+      .data                    (i_axi_s_ar)
   );
 
   // R
   multisim_client_pull #(
-      .SERVER_RUNTIME_DIRECTORY(SERVER_RUNTIME_DIRECTORY),
       .DATA_WIDTH($bits(axi_r_t))
   ) i_multisim_client_pull_axi_r (
-      .clk        (clk_gated),
-      .server_name(server_name_axi_r),
-      .data_rdy   (i_axi_s_rready),
-      .data_vld   (o_axi_s_rvalid),
-      .data       (o_axi_s_r)
+      .clk                     (clk_gated),
+      .server_runtime_directory(server_runtime_directory),
+      .server_name             (server_name_axi_r),
+      .data_rdy                (i_axi_s_rready),
+      .data_vld                (o_axi_s_rvalid),
+      .data                    (o_axi_s_r)
   );
 
 endmodule

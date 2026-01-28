@@ -79,14 +79,14 @@ module sim;
   bit exit_ack;
 
   multisim_client_push #(
-      .SERVER_RUNTIME_DIRECTORY("."),
       .DATA_WIDTH(1)
   ) i_multisim_server_pull_exit (
-      .clk        (clk),
-      .server_name("exit"),
-      .data_rdy   (exit_ack),
-      .data_vld   (exit),
-      .data       (  /*unused*/)
+      .clk                     (clk),
+      .server_runtime_directory("."),
+      .server_name             ("exit"),
+      .data_rdy                (exit_ack),
+      .data_vld                (exit),
+      .data                    (  /*unused*/)
   );
 
   always @(posedge clk) begin
@@ -111,25 +111,25 @@ module sim;
   bit [63:0] rw_rsp;
 
   multisim_client_push #(
-      .SERVER_RUNTIME_DIRECTORY("."),
       .DATA_WIDTH(3 * 64)
   ) i_multisim_client_push_rw_cmd (
-      .clk        (clk),
-      .server_name("rw_cmd"),
-      .data_rdy   (rw_cmd_rdy),
-      .data_vld   (rw_cmd_vld),
-      .data       (rw_cmd)
+      .clk                     (clk),
+      .server_runtime_directory("."),
+      .server_name             ("rw_cmd"),
+      .data_rdy                (rw_cmd_rdy),
+      .data_vld                (rw_cmd_vld),
+      .data                    (rw_cmd)
   );
 
   multisim_client_pull #(
-      .SERVER_RUNTIME_DIRECTORY("."),
       .DATA_WIDTH(64)
   ) i_multisim_client_pull_rw_rsp (
-      .clk        (clk),
-      .server_name("rw_rsp"),
-      .data_rdy   (rw_rsp_rdy),
-      .data_vld   (rw_rsp_vld),
-      .data       (rw_rsp)
+      .clk                     (clk),
+      .server_runtime_directory("."),
+      .server_name             ("rw_rsp"),
+      .data_rdy                (rw_rsp_rdy),
+      .data_vld                (rw_rsp_vld),
+      .data                    (rw_rsp)
   );
 
 

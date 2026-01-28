@@ -38,25 +38,25 @@ module cpu_multisim_client;
   );
 
   multisim_client_push #(
-      .SERVER_RUNTIME_DIRECTORY("../output_top"),
       .DATA_WIDTH(64)
   ) i_multisim_client_push (
-      .clk        (clk),
-      .server_name(server_name_cpu_to_noc),
-      .data_rdy   (data_cpu_to_noc_rdy),
-      .data_vld   (data_cpu_to_noc_vld),
-      .data       (data_cpu_to_noc)
+      .clk                     (clk),
+      .server_runtime_directory("../output_top"),
+      .server_name             (server_name_cpu_to_noc),
+      .data_rdy                (data_cpu_to_noc_rdy),
+      .data_vld                (data_cpu_to_noc_vld),
+      .data                    (data_cpu_to_noc)
   );
 
   multisim_client_pull #(
-      .SERVER_RUNTIME_DIRECTORY("../output_top"),
       .DATA_WIDTH(64)
   ) i_multisim_client_pull (
-      .clk        (clk),
-      .server_name(server_name_noc_to_cpu),
-      .data_rdy   (data_noc_to_cpu_rdy),
-      .data_vld   (data_noc_to_cpu_vld),
-      .data       (data_noc_to_cpu)
+      .clk                     (clk),
+      .server_runtime_directory("../output_top"),
+      .server_name             (server_name_noc_to_cpu),
+      .data_rdy                (data_noc_to_cpu_rdy),
+      .data_vld                (data_noc_to_cpu_vld),
+      .data                    (data_noc_to_cpu)
   );
 
   //initial begin

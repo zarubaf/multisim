@@ -1,8 +1,8 @@
 module multisim_client_quasi_static_push #(
-    parameter string SERVER_RUNTIME_DIRECTORY = "../output_top",
     parameter int DATA_WIDTH = 64
 ) (
     input bit clk,
+    input string server_runtime_directory,
     input string server_name,
     input bit [DATA_WIDTH-1:0] data
 );
@@ -26,21 +26,21 @@ module multisim_client_quasi_static_push #(
     end
     if (data_rdy && data_queue.size() > 0) begin
       data_push <= data_queue.pop_front();
-      data_vld <= 1;
+      data_vld  <= 1;
     end else begin
       data_vld <= 0;
     end
   end
 
   multisim_client_push #(
-      .SERVER_RUNTIME_DIRECTORY(SERVER_RUNTIME_DIRECTORY),
       .DATA_WIDTH(DATA_WIDTH)
   ) i_multisim_client_push (
-      .clk        (clk),
-      .server_name(server_name),
-      .data_rdy   (data_rdy),
-      .data_vld   (data_vld),
-      .data       (data_push)
+      .clk                     (clk),
+      .server_runtime_directory(server_runtime_directory),
+      .server_name             (server_name),
+      .data_rdy                (data_rdy),
+      .data_vld                (data_vld),
+      .data                    (data_push)
   );
 
 endmodule
