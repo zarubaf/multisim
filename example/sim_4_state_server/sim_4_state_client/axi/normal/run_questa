@@ -1,0 +1,14 @@
+#!/bin/bash
+
+set -e
+
+cpu_nb="$1"
+[ "$cpu_nb" = "" ] && cpu_nb=4
+
+mkdir -p output
+cp -rfL src/* output
+cd output
+
+qrun -64                   \
+  top.sv memory.sv cpu.sv  \
+  -GCPU_NB=$cpu_nb
