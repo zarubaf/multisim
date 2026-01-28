@@ -75,15 +75,17 @@ Find more info about PIDs/IPs of your clients in the server runtime directory in
 * server simulation, see [example](./example/sim_server/sim_client/core/multi/run_cpu)
 * client simulation, see [example](./example/sim_server/sim_client/core/multi/run_top)
 
-### shared libs
-
-[multisim_client](./src/core/multisim_client.cpp) and [multisim_server](./src/core/multisim_server.cpp) can be compiled as shared objects with the following command:
-
+### shared objects
+If your platform requires a shared object (.so file), it can be compiled like so:
 ```bash
-make RELEASE_DIR=... TARGET=SIMULATION|EMULATION|SW
+# SW client example
+g++ -o multisim_sw_client.so -g -shared -fPIC \
+  -DMULTISIM_SW                               \
+  $MULTISIM_SRC/core/multisim_client.cpp      \
+  $MULTISIM_SRC/core/socket_server/client.cpp
 ```
 
-The .so libs their headers are located in `RELEASE_DIR`.
+Look in the [example](./example) directory for more examples.
 
 # ⚖ pros and cons
 Pros:
