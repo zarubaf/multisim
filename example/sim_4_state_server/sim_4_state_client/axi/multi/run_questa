@@ -5,7 +5,14 @@ cpu_nb="$1"
 
 # on exit, send SIGTERM to all the processes in the foreground process group,
 # this allows for a clean termination of the clients
-trap 'kill -SIGTERM -$$' EXIT
+exit_clean=0
+send_sigterm_to_process_group() {
+  if ((exit_clean != 1)); then
+    echo "Send SIGTERM to process group"
+    kill -SIGTERM -$$
+  fi
+}
+trap send_sigterm_to_process_group EXIT
 
 # 1- clean server files
 rm -rf output_top/.multisim
@@ -17,3 +24,5 @@ done
 
 # 3- start server
 ./run_top $cpu_nb
+
+exit_clean=1
