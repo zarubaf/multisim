@@ -19,10 +19,10 @@ rm -rf output_top/.multisim
 
 # 2- start clients
 for ((i=0;i<cpu_nb;i++)); do
-  ./run_questa_cpu $i &
+  ./run_vcs_cpu $i &
 done
 
 # 3- start server
-./run_questa_top $cpu_nb
+./run_vcs_top $cpu_nb
 
 exit_clean=1

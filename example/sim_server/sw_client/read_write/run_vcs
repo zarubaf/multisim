@@ -16,16 +16,19 @@ EOF
 
 run_sim() {
   banner "sim: run server"
-  verilator --binary -j 0                                 \
-    --top-module top                                      \
+  g++ -o libdpi.so -g -shared -fPIC             \
+    -I${VCS_HOME}/include                       \
+    $MULTISIM_SRC/core/multisim_server.cpp      \
+    $MULTISIM_SRC/core/socket_server/server.cpp
+  vcs -q -full64 -sverilog                                \
+    -timescale=1ns/1ps                                    \
     ../src/top.sv                                         \
     +incdir+$MULTISIM_SRC/core                            \
     $MULTISIM_SRC/core/multisim_server_push.sv            \
     $MULTISIM_SRC/core/multisim_server_pull.sv            \
     $MULTISIM_SRC/core/multisim_server_pull_then_push.sv  \
-    $MULTISIM_SRC/core/multisim_server.cpp                \
-    $MULTISIM_SRC/core/socket_server/server.cpp
-  time ./obj_dir/Vtop
+    > compile.log
+  ./simv -sv_lib libdpi
 }
 
 #--------------------------------------------------------------

@@ -1,0 +1,18 @@
+#!/bin/bash
+
+set -e
+
+cpu_nb="$1"
+[ "$cpu_nb" = "" ] && cpu_nb=4
+
+mkdir -p output
+cp -rfL src/* output
+cd output
+
+vcs -q -full64 -sverilog            \
+  -ignore initializer_driver_checks \
+  -timescale=1ns/1ps                \
+  top.sv memory.sv cpu.sv           \
+  -pvalue+top.CPU_NB=$cpu_nb
+
+./simv

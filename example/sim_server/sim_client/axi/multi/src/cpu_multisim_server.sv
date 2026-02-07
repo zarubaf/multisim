@@ -29,6 +29,9 @@ module cpu_multisim_server
 
   string server_name;
   initial begin
+    // needed by VCS: without it cpu_index is evaluated as 0 at time 0,
+    // even though cpu_index is connected to a genvar when cpu_multisim_server is instantiated
+    #0;
     $sformat(server_name, "cpu_%0d", cpu_index);
   end
 

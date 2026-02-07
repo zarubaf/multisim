@@ -52,8 +52,9 @@ Tested platform combinations:
 
 ## available platforms
 * SIMULATION
-    * tested with **Verilator 5.040**
-    * tested with **QuestaSim 2024.3**
+    * tested with **Verilator 5.040** (`./run` in [sim_server examples](./example/sim_server/))
+    * tested with **QuestaSim 2024.3** (`./run_questa` in the [sim_server examples](./example/sim_server/))
+    * tested with **VCS X-2025.06** (`./run_vcs` in [sim_server examples](./example/sim_server/))
 * EMULATION
     * define `MULTISIM_EMULATION` in SV and C/C++ compilation
     * tested with **Veloce v23.0.1**
@@ -120,4 +121,5 @@ Cons:
 * harder debug: waveforms split on N+1 simulation, no time coherency in between them
 
 # 🚀 Future
+* add example with multisim_client_axi_pull and multisim_server_axi_push
 * simple transaction logging to help debug
