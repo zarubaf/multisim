@@ -164,6 +164,9 @@ module cpu
         $display("[cpu_%0d] CPU 0x%016x -> [0x%016x]", cpu_index, x, address);
         axi_write(address, x, int'(aw_w_wait_cycles));
       end
+    end else begin
+      repeat (2) @(posedge clk);
+      $finish;
     end
   end
 

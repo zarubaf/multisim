@@ -1,0 +1,23 @@
+#!/bin/bash
+
+# on exit, send SIGTERM to all the processes in the foreground process group,
+# this allows for a clean termination of the clients
+exit_clean=0
+send_sigterm_to_process_group() {
+  if ((exit_clean != 1)); then
+    echo "Send SIGTERM to process group"
+    kill -SIGTERM -$$
+  fi
+}
+trap send_sigterm_to_process_group EXIT
+
+# 1- clean server files
+rm -rf output_top/.multisim
+
+# 2- start clients
+./run_top &
+
+# 3- start server
+./run_cpu
+
+exit_clean=1

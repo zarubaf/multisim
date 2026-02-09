@@ -121,5 +121,4 @@ Cons:
 * harder debug: waveforms split on N+1 simulation, no time coherency in between them
 
 # 🚀 Future
-* add example with multisim_client_axi_pull and multisim_server_axi_push
 * simple transaction logging to help debug

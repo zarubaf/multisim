@@ -1,0 +1,30 @@
+#!/bin/bash
+
+set -e
+
+cpu_index=0
+
+output_dir=output_cpu_$cpu_index
+
+mkdir -p $output_dir
+cp -rfL src/* $output_dir
+cd $output_dir
+
+verilator --binary -j 0                         \
+  cpu_multisim_server.sv cpu.sv                 \
+  +incdir+$MULTISIM_SRC/core                    \
+  $MULTISIM_SRC/core/multisim_server_push.sv    \
+  $MULTISIM_SRC/core/multisim_server_pull.sv    \
+  $MULTISIM_SRC/axi/multisim_server_axi_push.sv \
+  $MULTISIM_SRC/core/multisim_server.cpp        \
+  $MULTISIM_SRC/core/socket_server/server.cpp # --trace --trace-structs
+
+cat << EOF
+
+----------------------------------------
+-- simulation start
+----------------------------------------
+EOF
+time ./obj_dir/Vcpu_multisim_server
+
+$MULTISIM_SRC/bin/kill_all_clients

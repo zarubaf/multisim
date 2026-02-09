@@ -1,0 +1,24 @@
+#!/bin/bash
+
+set -e
+
+mkdir -p output_top
+cp -rfL src/* output_top
+cd output_top
+
+verilator --binary -j 0                         \
+  +define+MULTISIM                              \
+  top.sv memory.sv cpu_multisim_client.sv       \
+  +incdir+$MULTISIM_SRC/core                    \
+  $MULTISIM_SRC/core/multisim_client_push.sv    \
+  $MULTISIM_SRC/core/multisim_client_pull.sv    \
+  $MULTISIM_SRC/axi/multisim_client_axi_pull.sv \
+  $MULTISIM_SRC/core/multisim_client.cpp        \
+  $MULTISIM_SRC/core/socket_server/client.cpp
+cat << EOF
+
+----------------------------------------
+-- simulation start
+----------------------------------------
+EOF
+(time ./obj_dir/Vtop) &> sim.log
