@@ -64,21 +64,21 @@ int Server::acceptNewSocket() {
 }
 
 char const *Server::getIp() {
-  setenv("LANG", "C", 1);
-  FILE *fp = popen("hostname -i", "r");
-  if (fp) {
-    char *p = NULL;
-    size_t n;
-    while ((getline(&p, &n, fp) > 0) && p) {
-      char *pos;
-      // stop at 1st '\n' or ' '
-      if ((pos = strchr(p, ' ')) != NULL)
-        *pos = '\0';
-      if ((pos = strchr(p, '\n')) != NULL)
-        *pos = '\0';
-      return p;
-    }
+  struct ifaddrs *ifaddr, *ifa;
+  if (getifaddrs(&ifaddr) == -1)
+    return "127.0.0.1";
+  for (ifa = ifaddr; ifa != NULL; ifa = ifa->ifa_next) {
+    if (ifa->ifa_addr == NULL || ifa->ifa_addr->sa_family != AF_INET)
+      continue;
+    // Skip loopback
+    if (strcmp(ifa->ifa_name, "lo") == 0 || strcmp(ifa->ifa_name, "lo0") == 0)
+      continue;
+    char *ip = new char[INET_ADDRSTRLEN];
+    struct sockaddr_in *sa = (struct sockaddr_in *)ifa->ifa_addr;
+    inet_ntop(AF_INET, &sa->sin_addr, ip, INET_ADDRSTRLEN);
+    freeifaddrs(ifaddr);
+    return ip;
   }
-  pclose(fp);
-  return NULL;
+  freeifaddrs(ifaddr);
+  return "127.0.0.1";
 }
