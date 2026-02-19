@@ -1,6 +1,5 @@
 #include "server.h"
 #include <string>
-using namespace std;
 
 std::set<char const *> Server::serverNameSet;
 
@@ -18,23 +17,24 @@ Server::Server(char const *server_info_dir, char const *name)
 void Server::start() {
   int i = 0;
   FILE *fp;
-  string server_info_file;
+  std::string server_info_file;
 
   // create server
   if (serverIsRunning) {
     fprintf(stderr, "ERROR: server [%s] start() has already been called\n", serverName);
     exit(EXIT_FAILURE);
   }
-  if ((server_fd = socket(AF_INET, SOCK_NONBLOCK | SOCK_STREAM, 0)) == 0) {
+  if ((server_fd = socket(AF_INET, SOCK_STREAM, 0)) == 0) {
     perror("socket failed");
     exit(EXIT_FAILURE);
   }
+  fcntl(server_fd, F_SETFL, O_NONBLOCK);
   address.sin_family = AF_INET;
   address.sin_addr.s_addr = INADDR_ANY;
   while (1) {
     serverPort = BASE_PORT + i;
     address.sin_port = htons(serverPort);
-    if (bind(server_fd, (struct sockaddr *)&address, addrlen) >= 0)
+    if (::bind(server_fd, (struct sockaddr *)&address, addrlen) >= 0)
       break;
     i++;
   }
@@ -47,7 +47,7 @@ void Server::start() {
 
   // print server's ip and port
   mkdir(serverInfoDir, 0777);
-  server_info_file = string(serverInfoDir) + "/server_" + string(serverName) + ".txt";
+  server_info_file = std::string(serverInfoDir) + "/server_" + std::string(serverName) + ".txt";
   fp = fopen(server_info_file.c_str(), "w+");
   fprintf(fp, "ip: %s\n", serverIp);
   fprintf(fp, "port: %0d\n", serverPort);
